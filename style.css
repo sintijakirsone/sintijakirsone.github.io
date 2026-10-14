@@ -1,547 +1,492 @@
-/* ============================================
-   CSS RESET - Noņem pārlūka default stilus
-   ============================================ */
+/* =========================================================
+   Sintija Kirsone — portfolio
+   Layout: fixed header (menu left, name right), works list
+   on the left, a scattered pile of works on the right.
+   Two backgrounds: textured grey (default) and white.
+   ========================================================= */
 
-* {
-    /* ↑ Zvaigznīte (*) = selektors VISIEM elementiem */
-   
-    margin: 0;
-    /* ↑ Noņem visas ārējās atstarpes */
-   
-    padding: 0;
-    /* ↑ Noņem visas iekšējās atstarpes */
-   
-    box-sizing: border-box;
-    /* ↑ Padding un border IETILPST width/height */
-    /* Atvieglo izmēru aprēķinus */
+:root {
+  --bg: #2c2c2b;
+  --fg: #ecebe6;
+  --fg-dim: #a9a8a2;
+  --accent: #f3d23a;          /* yellow selection */
+  --line: rgba(236, 235, 230, 0.28);
+  --panel: rgba(44, 44, 43, 0.88);
+  --shadow: rgba(0, 0, 0, 0.45);
+
+  --font-mono: "Fira Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-sans: "Inria Sans", "Helvetica Neue", Arial, sans-serif;
+
+  --texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.11 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+              radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.05), transparent 55%),
+              radial-gradient(ellipse at 85% 90%, rgba(0,0,0,0.22), transparent 60%);
+
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --top: calc(env(safe-area-inset-top, 0px) + 28px);
+  color-scheme: dark;
 }
 
-/* ============================================
-   PAMATA BODY STILI
-   ============================================ */
+html[data-bg="white"] {
+  --bg: #f6f5f2;
+  --fg: #1c1c1b;
+  --fg-dim: #6d6c67;
+  --accent: #c79a00;
+  --line: rgba(28, 28, 27, 0.25);
+  --panel: rgba(246, 245, 242, 0.92);
+  --shadow: rgba(40, 50, 60, 0.22);
+  --texture: none;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+html { background-color: var(--bg); }
 
 body {
-    /* ↑ Stili VISAM lapas saturam */
-   
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    /* ↑ Izmanto sistēmas fontu (Mac/Windows default) */
-    /* Sans-serif = bez dekoratīvām līnijām */
-   
-    line-height: 1.6;
-    /* ↑ Atstarpe starp teksta rindām (1.6x no fonta izmēra) */
-    /* Laba lasāmība */
-   
-    color: #1a1a1a;
-    /* ↑ Teksta krāsa - gandrīz melns (ne 100% melns) */
-    /* Hex kods: # + 6 simboli (RR GG BB) */
-   
-    background: #fafafa;
-    /* ↑ Lapas fona krāsa - gaišs pelēks */
+  margin: 0;
+  background-color: var(--bg);
+  background-image: var(--texture);
+  background-attachment: fixed;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.6s ease, color 0.6s ease;
+  overflow-x: hidden;
 }
 
-/* ============================================
-   HEADER - Augšējā navigācijas josla
-   ============================================ */
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+img { max-width: 100%; display: block; }
 
-header {
-    /* ↑ Mērķē <header> tagu */
-   
-    padding: 2rem 4rem;
-    /* ↑ Iekšējās atstarpes: 2rem augšā/apakšā, 4rem kreisais/labais */
-    /* rem = relative unit (1rem ≈ 16px) */
-   
-    background: white;
-    /* ↑ Balts fons */
-   
-    border-bottom: 1px solid #e5e5e5;
-    /* ↑ Plāna pelēka līnija apakšā */
-    /* 1px biezums, solid līnija, #e5e5e5 krāsa */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  padding-top: var(--top);
+  padding-left: calc(var(--gutter) + 2vw);
+  padding-right: calc(var(--gutter-r) + 2vw);
+  pointer-events: none;
+}
+.site-header > * { pointer-events: auto; }
+
+.main-nav { display: flex; gap: 22px; flex-wrap: wrap; }
+.main-nav a {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  transition: color 0.25s ease;
+}
+.main-nav a:hover { color: var(--accent); }
+.main-nav a.is-active { color: var(--accent); font-weight: 700; }
+
+.site-name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(16px, 1.7vw, 24px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-nav {
-    /* ↑ Mērķē <nav> tagu header iekšā */
-   
-    display: flex;
-    /* ↑ Flexbox layout - elementi rindā */
-   
-    justify-content: space-between;
-    /* ↑ Izvieto elementus: viens kreisajā, otrs labajā pusē */
-   
-    align-items: center;
-    /* ↑ Centrē elementus vertikāli */
-   
-    max-width: 1400px;
-    /* ↑ Maksimālais platums (lai neizplūstu uz lielajiem ekrāniem) */
-   
-    margin: 0 auto;
-    /* ↑ Centrē horizontāli: 0 augšā/apakšā, auto kreisais/labais */
+/* ---------- Corner controls (language, sound, background) ---------- */
+.corner-controls {
+  position: fixed;
+  z-index: 60;
+  left: calc(var(--gutter) + 2vw);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.lang-switch {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 3px 7px;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+}
+.lang-switch button { color: var(--fg-dim); padding: 0 1px; }
+.lang-switch button.is-active { color: var(--fg); font-weight: 600; }
+.lang-switch span { color: var(--fg-dim); }
+
+.icon-btn {
+  width: 28px; height: 24px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  backdrop-filter: blur(4px);
+}
+.icon-btn svg { width: 15px; height: 15px; }
+.icon-btn:hover { color: var(--accent); }
+.icon-btn[aria-pressed="true"] { color: var(--accent); }
+
+/* ---------- Views ---------- */
+.view { display: none; }
+.view.is-visible { display: block; }
+
+/* ---------- Works list (left) ---------- */
+.works-panel {
+  position: fixed;
+  z-index: 30;
+  top: calc(var(--top) + 40px);
+  left: calc(var(--gutter) + 2vw);
+  width: min(380px, 40vw);
+  max-height: calc(100vh - var(--top) - 110px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.works-panel.is-open { opacity: 1; transform: none; }
+
+.tech-bar { display: flex; flex-wrap: wrap; gap: 0 6px; margin-bottom: 16px; font-weight: 500; }
+.tech-bar button { text-transform: uppercase; letter-spacing: inherit; transition: color 0.25s; }
+.tech-bar button:hover, .tech-bar button.is-active { color: var(--accent); }
+.tech-bar button.is-active { font-weight: 700; }
+.tech-bar .sep { color: var(--fg-dim); }
+
+.year-group { margin: 0 0 10px 6px; }
+.year-label { color: var(--fg); margin-bottom: 4px; }
+.year-group ul { list-style: none; margin: 0; padding: 0 0 0 18px; }
+.year-group li { margin: 1px 0; }
+.work-link {
+  display: inline-block;
+  padding: 1px 0;
+  transition: color 0.25s ease;
+}
+.work-link.is-match { color: var(--accent); }
+.work-link:hover, .work-link.is-hover {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.all-link {
+  margin: 14px 0 0 6px;
+  display: inline-block;
+  transition: color 0.25s;
+}
+.all-link:hover, .all-link.is-active { color: var(--accent); font-weight: 700; }
+
+/* ---------- Pile ---------- */
+.pile {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.pile-item {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: center;
+  filter: drop-shadow(0 10px 18px var(--shadow));
+  transition:
+    left 1.6s cubic-bezier(.45, .05, .25, 1),
+    top 1.6s cubic-bezier(.45, .05, .25, 1),
+    width 1.6s cubic-bezier(.45, .05, .25, 1),
+    transform 1.6s cubic-bezier(.45, .05, .25, 1),
+    opacity 0.8s ease;
+  opacity: 0;
+}
+.pile-item img { width: 100%; height: auto; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.pile-item.is-in { opacity: 1; }
+.pile-item.is-hidden { opacity: 0 !important; pointer-events: none; transform: scale(0.85) !important; }
+.pile-item.is-center { z-index: 50 !important; }
+
+/* ---------- ALL works (scroll page) ---------- */
+.all-page {
+  position: relative;
+  z-index: 20;
+  padding-top: calc(var(--top) + 70px);
+  padding-bottom: 120px;
+  padding-left: calc(var(--gutter) + 2vw + min(380px, 40vw) + 40px);
+  padding-right: calc(var(--gutter-r) + 2vw);
+}
+.all-year {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  margin: 0 0 18px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.all-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 36px 28px;
+  margin-bottom: 64px;
+}
+.all-card { display: flex; flex-direction: column; gap: 10px; }
+.all-card .thumb {
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+}
+.all-card .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px var(--shadow));
+  transition: transform 0.6s ease;
+}
+.all-card:hover .thumb img { transform: scale(1.04) rotate(-1deg); }
+.all-card .title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.all-card:hover .title { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.all-card .meta { font-size: 13px; color: var(--fg-dim); }
+
+/* ---------- About ---------- */
+.about-page {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+}
+.about-text {
+  position: absolute;
+  top: calc(var(--top) + 90px);
+  left: calc(var(--gutter) + 2vw + 1.5vw);
+  width: min(460px, 40vw);
+}
+.about-text h1 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 22px;
+}
+.about-text p { margin: 0; font-size: 15px; line-height: 1.6; max-width: 46ch; }
+
+.portrait {
+  position: absolute;
+  right: 12vw;
+  bottom: 0;
+  width: min(36vw, 520px);
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.portrait img { width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+
+/* ---------- Contact ---------- */
+.contact-page { min-height: 100vh; }
+
+/* ---------- Work page ---------- */
+.work-page {
+  padding-top: calc(var(--top) + 90px);
+  padding-bottom: 120px;
+  padding-left: calc(var(--gutter) + 2vw + 3vw);
+  padding-right: calc(var(--gutter-r) + 2vw + 3vw);
+}
+.work-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 48px 6vw;
+  align-items: start;
+}
+.work-info h1 {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  text-wrap: balance;
+}
+.work-info .facts { font-size: 15px; line-height: 1.55; margin-bottom: 28px; }
+.work-info .facts div { min-width: 0; }
+.work-info .tech-tags { color: var(--fg-dim); }
+.work-text p { margin: 0 0 1em; max-width: 60ch; }
+
+.media { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.media img, .media video {
+  width: 100%;
+  height: auto;
+  cursor: zoom-in;
+  background: rgba(0, 0, 0, 0.08);
+}
+.media video { cursor: default; }
+
+.video-box {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  overflow: hidden;
+  background: #111;
+  display: grid;
+  place-items: center;
+}
+.video-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; cursor: default; }
+.video-box .play {
+  position: relative;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.85);
+  display: grid; place-items: center;
+  color: #fff;
+}
+.video-box .play svg { width: 26px; height: 26px; margin-left: 4px; }
+.video-box .soon {
+  position: absolute; left: 12px; bottom: 10px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: #fff; background: rgba(0,0,0,.55); padding: 2px 6px; text-transform: uppercase;
 }
 
-nav h1 {
-    /* ↑ Mērķē <h1> kas ir nav iekšā (logo/vārds) */
-   
-    font-size: 1rem;
-    /* ↑ Izmērs 1rem (≈16px) - mazs, minimālistisks */
-   
-    font-weight: 500;
-    /* ↑ Svars 500 (starp normal 400 un bold 700) */
-   
-    letter-spacing: -0.02em;
-    /* ↑ Samazina atstarpi starp burtiem (saspiež) */
-    /* Negatīvs = tuvāk kopā */
+.pubs { margin-top: 36px; }
+.pubs h2 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.pubs ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.pubs a { border-bottom: 1px solid var(--line); }
+.pubs a:hover { color: var(--accent); border-color: var(--accent); }
+.pubs .src { color: var(--fg-dim); }
+
+.work-nav {
+  margin-top: 72px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.work-nav a:hover { color: var(--accent); }
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(10, 10, 10, 0.9);
+  display: grid; place-items: center;
+  padding: 4vh 4vw;
+  cursor: zoom-out;
+}
+.lightbox img { max-height: 92vh; width: auto; }
+
+/* ---------- Ice ---------- */
+.ice-layer, .idle-ice {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ice-layer { z-index: 15; }
+.idle-ice { z-index: 80; }
+
+.frost {
+  position: absolute;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity, clip-path;
+}
+.frost img { width: 100%; height: auto; display: block; user-select: none; }
+
+/* growing from its base */
+.frost.grow { animation: frost-grow var(--dur, 2.6s) cubic-bezier(.2, .7, .25, 1) var(--delay, 0s) both; }
+@keyframes frost-grow {
+  0%   { clip-path: inset(100% 0 0 0); transform: var(--base) scale(0.55); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { clip-path: inset(0 0 0 0); transform: var(--base) scale(1); opacity: 1; }
 }
 
-nav ul {
-    /* ↑ Mērķē <ul> sarakstu nav iekšā */
-   
-    list-style: none;
-    /* ↑ Noņem aizzīmes (bullet points) */
-   
-    display: flex;
-    /* ↑ Saraksta elementi rindā (ne pa vertikāli) */
-   
-    gap: 3rem;
-    /* ↑ Atstarpe starp saraksta elementiem */
+/* gentle drift on the home page after a while */
+.frost.drift { animation: frost-drift var(--sway, 9s) ease-in-out infinite alternate; }
+@keyframes frost-drift {
+  0%   { transform: var(--base) translate(0, 0) rotate(0deg); }
+  50%  { transform: var(--base) translate(var(--dx1, 10px), var(--dy1, -6px)) rotate(var(--r1, 2deg)); }
+  100% { transform: var(--base) translate(var(--dx2, -8px), var(--dy2, 4px)) rotate(var(--r2, -2deg)); }
 }
 
-nav a {
-    /* ↑ Mērķē VISAS saites (<a>) nav iekšā */
-   
-    color: #666;
-    /* ↑ Vidēji pelēka krāsa */
-   
-    text-decoration: none;
-    /* ↑ Noņem pasvītrojumu */
-   
-    font-size: 0.95rem;
-    /* ↑ Mazliet mazāks par normālo (15.2px) */
-   
-    transition: color 0.2s;
-    /* ↑ Smooth krāsas maiņa 0.2 sekundes */
-    /* Animē hover efektu */
+/* move to the right corner, then melt */
+.frost.to-corner {
+  transition: left 1.3s cubic-bezier(.5, 0, .3, 1), top 1.3s cubic-bezier(.5, 0, .3, 1),
+              transform 1.3s cubic-bezier(.5, 0, .3, 1);
+}
+.frost.melt {
+  transition: opacity 1.6s ease, filter 1.6s ease, transform 1.8s ease-in, left 1.3s, top 1.3s;
+  opacity: 0 !important;
+  filter: blur(8px) brightness(1.3);
 }
 
-nav a:hover {
-    /* ↑ Kad pele ir virs saites */
-   
-    color: #1a1a1a;
-    /* ↑ Kļūst tumšāka (gandrīz melna) */
+/* full-screen idle freeze */
+.idle-ice .glass {
+  position: absolute; inset: 0;
+  background: rgba(205, 222, 235, 0.12);
+  backdrop-filter: blur(0px);
+  opacity: 0;
+  transition: opacity 2.2s ease, backdrop-filter 2.2s ease;
+}
+html[data-bg="white"] .idle-ice .glass { background: rgba(232, 240, 246, 0.35); }
+.idle-ice.is-frozen .glass { opacity: 1; backdrop-filter: blur(2.5px); }
+.idle-ice.is-melting .glass { opacity: 0; backdrop-filter: blur(0px); transition: opacity 1.4s ease, backdrop-filter 1.4s ease; }
+.idle-ice .frost { transform-origin: 50% 100%; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px), (pointer: coarse) and (max-width: 1024px) {
+  html, body { height: auto; min-height: 100%; }
+  body { background-attachment: scroll; }
+  .site-header { flex-direction: column-reverse; gap: 10px; padding-left: var(--gutter); padding-right: var(--gutter-r); }
+  .site-name { font-size: 18px; }
+  .corner-controls { left: var(--gutter); }
+
+  .works-panel {
+    position: absolute;
+    top: calc(var(--top) + 86px);
+    left: var(--gutter);
+    right: var(--gutter-r);
+    width: auto;
+    max-height: none;
+    overflow: visible;
+    font-size: 13px;
+  }
+  .work-link { padding: 4px 0; }
+  .year-group li { margin: 0; }
+  .pile { position: absolute; inset: auto 0 auto 0; height: 0; }
+  .pile-item { filter: drop-shadow(0 6px 10px var(--shadow)); }
+
+  .all-page { padding-left: var(--gutter); padding-right: var(--gutter-r); padding-top: calc(var(--top) + 90px); }
+  .all-page.with-list { padding-top: 0; }
+  .all-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+
+  .about-page { position: static; }
+  .about-text { position: static; width: auto; padding: calc(var(--top) + 100px) var(--gutter-r) 24px var(--gutter); }
+  .portrait { position: static; width: 78%; margin: 12px auto 90px; transform: none !important; }
+
+  .work-page { padding-left: var(--gutter); padding-right: var(--gutter-r); padding-top: calc(var(--top) + 100px); }
+  .work-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
 }
 
-/* ============================================
-   MAIN - Galvenais saturs
-   ============================================ */
-
-main {
-    /* ↑ Mērķē <main> tagu */
-   
-    max-width: 1400px;
-    /* ↑ Ierobežo platumu */
-   
-    margin: 0 auto;
-    /* ↑ Centrē horizontāli */
-   
-    padding: 0 4rem;
-    /* ↑ Padding: 0 augšā/apakšā, 4rem kreisais/labais */
+@media (prefers-reduced-motion: reduce) {
+  .frost.grow, .frost.drift { animation: none; }
+  .pile-item, .frost.to-corner, .frost.melt { transition-duration: 0.01s !important; }
 }
-
-/* ============================================
-   HERO SEKCIJA - Liela intro daļa
-   ============================================ */
-
-.hero {
-    /* ↑ Punkts (.) nozīmē CLASS selector */
-    /* Mērķē elementus ar class="hero" */
-   
-    padding: 8rem 0 6rem;
-    /* ↑ Padding: 8rem augšā, 0 kreisais/labais, 6rem apakšā */
-    /* Daudz vietas augšā un apakšā */
-}
-
-.hero h2 {
-    /* ↑ Mērķē <h2> kas ir .hero iekšā */
-   
-    font-size: 4rem;
-    /* ↑ Ļoti liels (64px) - galvenais virsraksts */
-   
-    font-weight: 300;
-    /* ↑ Plāns fonts (light) */
-    /* 300 ir viegls, 400 normāls, 700 treknraksts */
-   
-    letter-spacing: -0.03em;
-    /* ↑ Vēl vairāk saspiesti burti */
-   
-    margin-bottom: 1.5rem;
-    /* ↑ Atstarpe zem virsraksta */
-   
-    line-height: 1.1;
-    /* ↑ Mazāka atstarpe starp rindām (kompaktāks) */
-}
-
-.hero p {
-    /* ↑ Mērķē <p> kas ir .hero iekšā */
-   
-    font-size: 1.25rem;
-    /* ↑ Lielāks par normālo (20px) */
-   
-    color: #666;
-    /* ↑ Vidēji pelēks (vieglāks par virsrakstu) */
-   
-    font-weight: 300;
-    /* ↑ Plāns fonts */
-   
-    max-width: 600px;
-    /* ↑ Ierobežo teksta platumu (lasāmībai) */
-    /* Pārāk plats teksts ir grūti lasāms */
-}
-
-/* ============================================
-   PORTFOLIO SEKCIJA - Darbu galerija
-   ============================================ */
-
-.portfolio {
-    /* ↑ Mērķē elementus ar class="portfolio" */
-   
-    padding: 4rem 0 8rem;
-    /* ↑ Padding: 4rem augšā, 0 kreisais/labais, 8rem apakšā */
-}
-
-.portfolio h2 {
-    /* ↑ Virsraksts portfolio sekcijā */
-   
-    font-size: 0.875rem;
-    /* ↑ Mazs (14px) */
-   
-    text-transform: uppercase;
-    /* ↑ Visi burti LIELIE */
-   
-    letter-spacing: 0.1em;
-    /* ↑ Daudz vietas starp burtiem (plašāk) */
-    /* Pozitīvs = tālāk */
-   
-    color: #999;
-    /* ↑ Gaišs pelēks */
-   
-    margin-bottom: 4rem;
-    /* ↑ Liela atstarpe zem virsraksta */
-   
-    font-weight: 500;
-    /* ↑ Vidēji smags */
-}
-
-/* ============================================
-   GALERIJA - Projektu grid
-   ============================================ */
-
-.gallery {
-    /* ↑ Container projektu kartītēm */
-   
-    display: grid;
-    /* ↑ CSS Grid layout (nevis flexbox) */
-    /* Grid = 2D layout (rindas UN kolonnas) */
-   
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    /* ↑ MAĢIJA! Automātisks kolonnu skaits */
-    /* repeat = atkārto */
-    /* auto-fit = pielāgojas ekrāna platumam */
-    /* minmax(400px, 1fr) = minimums 400px, maksimums 1 daļa */
-    /* Rezultāts: 3 kolonnas plašam, 2 vidējam, 1 mobilajam */
-   
-    gap: 3rem;
-    /* ↑ Atstarpe starp grid elementiem */
-}
-
-/* ============================================
-   PROJEKTA KARTĪTE - Atsevišķs darbs
-   ============================================ */
-
-.project-card {
-    /* ↑ Vispārīgi stili VISĀM kartītēm */
-   
-    background: white;
-    /* ↑ Balts fons */
-   
-    transition: transform 0.3s ease;
-    /* ↑ Animē transform izmaiņas 0.3 sekundes */
-    /* ease = sākas lēni, paātrinās, beidzas lēni */
-   
-    cursor: pointer;
-    /* ↑ Kursors kļūst par rociņu (norāda, ka klikšķināms) */
-}
-
-.project-card:hover {
-    /* ↑ Kad pele ir virs kartītes */
-   
-    transform: translateY(-4px);
-    /* ↑ Paceļ kartīti 4px uz augšu */
-    /* Negatīvs Y = uz augšu, pozitīvs = uz leju */
-}
-
-.project-card .img-placeholder {
-    /* ↑ Attēla vietas holders */
-    /* Atstarpe starp .project-card un .img-placeholder = descendant selector */
-    /* Mērķē .img-placeholder KAS IR .project-card iekšā */
-   
-    width: 100%;
-    /* ↑ Pilns platums no vecāka elementa */
-   
-    aspect-ratio: 4/3;
-    /* ↑ Fiksēts platuma/augstuma attiecība */
-    /* 4:3 = standarta foto proporcija */
-    /* Automātiski aprēķina augstumu no platuma */
-   
-    display: flex;
-    /* ↑ Flexbox, lai centrētu saturu */
-   
-    align-items: center;
-    /* ↑ Centrē vertikāli */
-   
-    justify-content: center;
-    /* ↑ Centrē horizontāli */
-   
-    font-size: 3rem;
-    /* ↑ Liels fonts (ja liek emoji vai tekstu) */
-   
-    background: #f5f5f5;
-    /* ↑ Gaišs pelēks fons (default) */
-   
-    margin-bottom: 1.5rem;
-    /* ↑ Atstarpe zem attēla */
-}
-
-/* Dažādas fona krāsas katrai kartītei */
-
-.card1 .img-placeholder {
-    /* ↑ Tikai pirmā kartīte (class="card1") */
-   
-    background: #f0f0f0;
-    /* ↑ Mazliet tumšāks pelēks */
-}
-
-.card2 .img-placeholder {
-    /* ↑ Tikai otrā kartīte */
-   
-    background: #e8e8e8;
-    /* ↑ Vēl tumšāks */
-}
-
-.card3 .img-placeholder {
-    /* ↑ Tikai trešā kartīte */
-   
-    background: #f5f5f5;
-    /* ↑ Gaišs (tāds pats kā default) */
-}
-
-.project-card h3 {
-    /* ↑ Projekta nosaukums kartītē */
-   
-    font-size: 1.25rem;
-    /* ↑ Vidēji liels (20px) */
-   
-    font-weight: 400;
-    /* ↑ Normāls svars (ne treknraksts) */
-   
-    color: #1a1a1a;
-    /* ↑ Gandrīz melns */
-   
-    margin-bottom: 0.5rem;
-    /* ↑ Neliela atstarpe zem nosaukuma */
-}
-
-.project-card p {
-    /* ↑ Projekta apraksts kartītē */
-   
-    color: #666;
-    /* ↑ Vidēji pelēks (vieglāks par nosaukumu) */
-   
-    font-size: 0.95rem;
-    /* ↑ Mazliet mazāks (15.2px) */
-   
-    font-weight: 300;
-    /* ↑ Plāns fonts */
-}
-
-/* ============================================
-   FOOTER - Apakšējā daļa
-   ============================================ */
-
-footer {
-    /* ↑ Mērķē <footer> tagu */
-   
-    background: white;
-    /* ↑ Balts fons */
-   
-    border-top: 1px solid #e5e5e5;
-    /* ↑ Plāna pelēka līnija AUGŠĀ */
-   
-    padding: 3rem 4rem;
-    /* ↑ Padding: 3rem augšā/apakšā, 4rem kreisais/labais */
-   
-    margin-top: 4rem;
-    /* ↑ Liela atstarpe virs footer */
-}
-
-.footer-content {
-    /* ↑ Container footer saturam */
-   
-    max-width: 1400px;
-    /* ↑ Ierobežo platumu */
-   
-    margin: 0 auto;
-    /* ↑ Centrē horizontāli */
-   
-    display: flex;
-    /* ↑ Flexbox layout */
-   
-    justify-content: space-between;
-    /* ↑ Copyright kreisajā, saites labajā pusē */
-   
-    align-items: center;
-    /* ↑ Centrē vertikāli */
-}
-
-footer p {
-    /* ↑ Copyright teksts */
-   
-    color: #999;
-    /* ↑ Gaišs pelēks */
-   
-    font-size: 0.875rem;
-    /* ↑ Mazs (14px) */
-}
-
-.social-links {
-    /* ↑ Container sociālajām saitēm */
-   
-    display: flex;
-    /* ↑ Saites rindā */
-   
-    gap: 2rem;
-    /* ↑ Atstarpe starp saitēm */
-}
-
-.social-links a {
-    /* ↑ Atsevišķa sociālā saite */
-   
-    color: #666;
-    /* ↑ Vidēji pelēks */
-   
-    text-decoration: none;
-    /* ↑ Bez pasvītrojuma */
-   
-    font-size: 0.875rem;
-    /* ↑ Mazs (14px) */
-   
-    transition: color 0.2s;
-    /* ↑ Smooth krāsas maiņa */
-}
-
-.social-links a:hover {
-    /* ↑ Kad pele virs saites */
-   
-    color: #1a1a1a;
-    /* ↑ Kļūst tumšāka */
-}
-
-/* ============================================
-   RESPONSIVE - Mobilajiem telefoniem
-   ============================================ */
-
-@media (max-width: 768px) {
-    /* ↑ Media query = CSS kas darbojas TIK JA... */
-    /* max-width: 768px = ekrāns 768px vai mazāks */
-    /* Tipiskais tablet/phone breakpoint */
-   
-    header, main, footer {
-        /* ↑ Visiem trim elementiem */
-       
-        padding-left: 2rem;
-        padding-right: 2rem;
-        /* ↑ Mazāks padding sānos (4rem → 2rem) */
-        /* Vairāk vietas šaurā ekrānā */
-    }
-
-    nav {
-        /* ↑ Navigācija mobilajā */
-       
-        flex-direction: column;
-        /* ↑ Elementi pa vertikāli (ne horizontāli) */
-        /* Logo virs menu */
-       
-        gap: 1.5rem;
-        /* ↑ Atstarpe starp logo un menu */
-       
-        align-items: flex-start;
-        /* ↑ Izlīdzina pa kreisi (nevis centru) */
-    }
-
-    nav ul {
-        /* ↑ Menu saraksts mobilajā */
-       
-        gap: 2rem;
-        /* ↑ Mazāka atstarpe (3rem → 2rem) */
-    }
-
-    .hero {
-        /* ↑ Hero sekcija mobilajā */
-       
-        padding: 4rem 0 3rem;
-        /* ↑ Mazāks padding (8rem → 4rem, 6rem → 3rem) */
-    }
-
-    .hero h2 {
-        /* ↑ Hero virsraksts mobilajā */
-       
-        font-size: 2.5rem;
-        /* ↑ Mazāks (4rem → 2.5rem = 64px → 40px) */
-    }
-
-    .hero p {
-        /* ↑ Hero teksts mobilajā */
-       
-        font-size: 1.1rem;
-        /* ↑ Mazāks (1.25rem → 1.1rem) */
-    }
-
-    .gallery {
-        /* ↑ Projektu grid mobilajā */
-       
-        grid-template-columns: 1fr;
-        /* ↑ TIK 1 kolonna (nevis 2-3) */
-        /* Visi projekti pa vertikāli */
-    }
-
-    .footer-content {
-        /* ↑ Footer saturs mobilajā */
-       
-        flex-direction: column;
-        /* ↑ Elementi pa vertikāli */
-        /* Copyright virs saitēm */
-       
-        gap: 1.5rem;
-        /* ↑ Atstarpe starp elementiem */
-       
-        align-items: flex-start;
-        /* ↑ Izlīdzina pa kreisi */
-    }
-}
-
-/* ============================================
-   KOPSAVILKUMS - KO MAINĪT:
-   ============================================
-   
-   KRĀSAS:
-   - Rinda 32: Teksta krāsa (#1a1a1a)
-   - Rinda 35: Fona krāsa (#fafafa)
-   - Rinda 54: Header fons (white)
-   
-   IZMĒRI:
-   - Rinda 139: Hero virsraksts (4rem)
-   - Rinda 227: Galvenā platums (1400px)
-   
-   FONTI:
-   - Rinda 26: Font family
-   
-   ============================================ */
-
-
