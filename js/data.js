@@ -37,7 +37,7 @@ window.UI = {
 };
 
 window.ABOUT = {
-  photo: "images/about/portrait-placeholder.svg",
+  photo: "images/about/Layer1.png",
   text: {
     en: "My name is Sintija Kirsone. I am a multidisciplinary artist based in Riga, Latvia. My main focus is creating installations and art objects that reflect our current times and ourselves.",
     lv: "Mani sauc Sintija Kirsone. Esmu multidisciplināra māksliniece no Rīgas. Galvenokārt veidoju instalācijas un mākslas objektus, kas atspoguļo mūsdienas un mūs pašus.",
