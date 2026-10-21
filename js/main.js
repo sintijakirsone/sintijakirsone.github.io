@@ -258,26 +258,38 @@
     var el = portrait.el;
     var prev = el.style.transform;
     el.style.transform = "none";
-    portrait.rest = el.getBoundingClientRect();
+    var b = el.getBoundingClientRect();
+    // when the photo is limited by screen height, it is narrower than its box: measure the visible picture
+    var img = el.querySelector("img");
+    var w = b.width;
+    if (img && img.naturalWidth && img.naturalHeight) {
+      w = Math.min(b.width, b.height * img.naturalWidth / img.naturalHeight);
+    }
+    var left = b.left + (b.width - w) / 2;
+    portrait.rest = { left: left, right: left + w, top: b.top, bottom: b.bottom, width: w, height: b.height };
     el.style.transform = prev;
   }
   function portraitLoop() {
     var P = portrait, r = P.rest;
     if (!r || route !== "about" || window.Site.isMobile()) { P.raf = 0; return; }
+    var ESCAPE_ZONE = 180;   // px: how close the mouse must come before the photo runs away
     var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     var dx = cx - P.mx, dy = cy - P.my;
     var d = Math.hypot(dx, dy) || 1;
-    var R = Math.max(r.width, r.height) * 0.62 + 140;
+    // distance from the mouse to the photo's edge (0 when the mouse is on the photo)
+    var ex = Math.max(r.left - P.mx, 0, P.mx - r.right);
+    var ey = Math.max(r.top - P.my, 0, P.my - r.bottom);
+    var edge = Math.hypot(ex, ey);
     var tx = 0, ty = 0, ts = 1;
-    if (d < R) {
-      var push = 1 - d / R;                    // 0 far … 1 on top of it
-      ts = 1 - 0.7 * Math.min(1, push * 1.4);
-      var dist = push * r.width * 0.9;
+    if (edge < ESCAPE_ZONE) {
+      var push = 1 - edge / ESCAPE_ZONE;       // 0 far … 1 on top of it
+      ts = 1 - 0.7 * push;
+      var dist = push * r.width * 0.6;
       tx = (dx / d) * dist;
       ty = (dy / d) * dist * 0.4;
       var W = window.innerWidth, H = window.innerHeight;
-      tx = Math.max(-r.left + 20, Math.min(W - r.right + r.width * (1 - ts) / 2 - 10, tx));
-      ty = Math.max(-r.top + 120, Math.min(H - r.bottom, ty));
+      tx = Math.min(W - r.right + r.width * (1 - ts) / 2, Math.max(-r.left + 20, tx));
+      ty = Math.min(H - r.bottom, Math.max(-r.top + 110, ty));
     }
     P.ox += (tx - P.ox) * 0.09;
     P.oy += (ty - P.oy) * 0.09;
