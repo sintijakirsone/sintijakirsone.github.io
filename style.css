@@ -289,7 +289,7 @@ img { max-width: 100%; display: block; }
   position: absolute;
   right: 12vw;
   bottom: 0;
-  width: min(36vw, 520px);
+  width: min(55vw, 900px);
   transform-origin: 50% 100%;
   will-change: transform;
 }
