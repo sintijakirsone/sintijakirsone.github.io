@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  var HOVER_DELAY = 500;   // ms of hovering a title before the work moves to the center
+  var HOVER_DELAY = 300;   // ms of hovering a title before the work moves to the center
   var DRIFT_AFTER = 10000;  // ms on the home page before the ice starts drifting
 
   var $ = function (s) { return document.querySelector(s); };
