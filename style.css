@@ -286,6 +286,19 @@ img { max-width: 100%; display: block; }
 .about-text p { margin: 0; font-size: 15px; line-height: 1.6; max-width: 46ch; }
 
 .portrait {
+   /* ===== About photo size for different screens ===== */
+/* laptops (up to 1440 px wide) */
+@media (min-width: 761px) and (max-width: 1440px) {
+  .portrait { width: 50vw; }
+}
+/* big monitors (1441–1920 px wide) */
+@media (min-width: 1441px) and (max-width: 1920px) {
+  .portrait { width: 55vw; }
+}
+/* very big screens (wider than 1920 px) */
+@media (min-width: 1921px) {
+  .portrait { width: 60vw; }
+}
   position: absolute;
   right: 12vw;
   bottom: 0;
