@@ -7,12 +7,12 @@
    • To add one, copy a line and change name, handle and url.
    ========================================================= */
 var CONTACT = {
-  email: "hello@example.com",
+  email: "sintija.kirsone12@gmail.com",
 
   socials: [
-    { name: "Instagram", handle: "@yourhandle", url: "https://www.instagram.com/yourhandle/" },
-    { name: "LinkedIn",  handle: "Sintija Kirsone", url: "https://www.linkedin.com/in/yourname/" },
-    { name: "Vimeo",     handle: "vimeo.com/yourname", url: "https://vimeo.com/yourname" }
+    { name: "Instagram", handle: "@spooksisreal", url: "https://www.instagram.com/spooksisreal/" },
+    { name: "LinkedIn",  handle: "Sintija Kirsone", url: "https://www.linkedin.com/in/sintija-kirsone-8b04a1210/" },
+    { name: "YouTube",     handle: "@SpooksIsReal2", url: "https://www.youtube.com/@SpooksIsReal2" }
   ],
 
   location: { en: "Riga, Latvia", lv: "Rīga, Latvija", zh: "" },
@@ -36,7 +36,7 @@ var CONTACT = {
      sending is not set up yet.                                */
   messages: {
     enabled: true,
-    scriptUrl: "PASTE_YOUR_WEB_APP_URL_HERE",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbxHFhE_r3Fq77IXzDIPPtFwuCC1rzJ-hBleWTwVPUh355oMob-rkqPv7ozFRIbKErh8/exec",
     waitBetweenMessages: 60   // seconds one visitor must wait before sending again
   }
 };
