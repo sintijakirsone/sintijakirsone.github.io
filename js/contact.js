@@ -36,7 +36,7 @@ var CONTACT = {
      sending is not set up yet.                                */
   messages: {
     enabled: true,
-    scriptUrl: "https://script.google.com/macros/s/AKfycbxHFhE_r3Fq77IXzDIPPtFwuCC1rzJ-hBleWTwVPUh355oMob-rkqPv7ozFRIbKErh8/exec",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbz27YAHImc2ZNDTgPNgaoGj29p8ThrxBf_EAkry5TDvZRqSp5suESjZ0237iMjD5dXm/exec",
     waitBetweenMessages: 60   // seconds one visitor must wait before sending again
   }
 };
