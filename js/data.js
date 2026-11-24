@@ -71,8 +71,26 @@ function placeholderWork(id, title, year, techniques, materialsEn, materialsLv, 
 
 /* Works are shown newest year first. Order inside a year = order here. */
 window.WORKS = [
-  placeholderWork("piepuskot", "PIEPŪŠĶOT", 2026, ["installation"],
-    "Plaster, rope, found objects", "Ģipsis, virve, atrasti objekti"),
+{
+  id: "piepuskot",
+  title: "PIEPUŠĶOT",
+  year: 2026,
+  techniques: ["installation"],
+  materials: { en: "signature technique, crystallization", lv: "autortehnika, kristalizācija", zh: "" },
+  cutout: "images/works/tas-nekas/piepuskotCUTOUT.png",
+  images: [
+    "images/works/tas-nekas/piepuskot1.jpg",
+    "images/works/tas-nekas/piepuskot2.jpg",
+    "images/works/tas-nekas/piepuskot3.jpg",
+    "images/works/tas-nekas/piepuskot4.jpg",
+    "images/works/tas-nekas/piepuskot5.jpg",
+    "images/works/tas-nekas/piepuskot10.jpg",
+    "images/works/tas-nekas/piepuskot789.jpg",
+  ],
+  video: null,
+  text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+  publications: []
+},
   placeholderWork("tas-nekas", "TAS NEKAS", 2026, ["screenprint", "installation"],
     "Ice, screen print, oil paint", "Ledus, sietspiede, eļļas krāsa",
     { video: { placeholder: true },
