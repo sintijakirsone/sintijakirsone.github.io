@@ -1,5 +1,5 @@
 /* =========================================================
-   COMMON — header, language, background, sound, idle freeze.
+   COMMON — header, language, background, idle freeze.
    Used by every page.
    ========================================================= */
 (function () {
@@ -46,8 +46,6 @@
   document.documentElement.setAttribute("data-bg", store("sk-bg") || "grey");
 
   /* ---------- icons ---------- */
-  var ICON_SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
-  var ICON_SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
   var ICON_BG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>';
 
   /* ---------- build header + corner controls ---------- */
@@ -71,7 +69,6 @@
         '<button type="button" data-lang="en">ENG</button><span>/</span>' +
         '<button type="button" data-lang="zh">中文</button>' +
       '</div>' +
-      '<button type="button" class="icon-btn" id="sound-toggle" aria-pressed="false" title="Sound"></button>' +
       '<button type="button" class="icon-btn" id="bg-toggle" aria-pressed="false" title="Background">' + ICON_BG + '</button>';
     document.body.appendChild(corner);
 
@@ -81,32 +78,6 @@
     document.getElementById("bg-toggle").addEventListener("click", function () {
       setBg(document.documentElement.getAttribute("data-bg") === "white" ? "grey" : "white");
     });
-
-    // sound: off by default; remembered choice is re-enabled on first click/tap
-    var soundBtn = document.getElementById("sound-toggle");
-    function paintSound(on) {
-      soundBtn.innerHTML = on ? ICON_SOUND_ON : ICON_SOUND_OFF;
-      soundBtn.setAttribute("aria-pressed", on);
-      soundBtn.setAttribute("aria-label", on ? "Sound on" : "Sound off");
-    }
-    var wantSound = store("sk-sound") === "on";
-    paintSound(wantSound);
-    soundBtn.addEventListener("click", function () {
-      var on = !window.Ice.sound.isEnabled();
-      window.Ice.sound.setEnabled(on);
-      store("sk-sound", on ? "on" : "off");
-      paintSound(on);
-      if (on) window.Ice.sound.crackle(0.8);
-    });
-    if (wantSound) {
-      var unlock = function () {
-        window.Ice.sound.setEnabled(true);
-        window.removeEventListener("pointerdown", unlock, true);
-        window.removeEventListener("keydown", unlock, true);
-      };
-      window.addEventListener("pointerdown", unlock, true);
-      window.addEventListener("keydown", unlock, true);
-    }
 
     setActiveNav(active);
     setLang(lang);

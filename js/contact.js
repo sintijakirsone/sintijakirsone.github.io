@@ -327,7 +327,6 @@ var CONTACT = {
 
   function afterSent() {
     frost.refreezeMessage();
-    if (window.Ice && window.Ice.sound) window.Ice.sound.crackle(1.6);
     renderBar();
     var em = area.querySelector(".frost-email"); if (em) em.value = "";
     var tx = area.querySelector(".frost-text"); if (tx) tx.value = "";
@@ -650,7 +649,6 @@ var CONTACT = {
       var go = function () {
         wipeC.getContext("2d").clearRect(0, 0, W, H);
         cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
-        if (window.Ice && window.Ice.sound) window.Ice.sound.crackle(2.2);
       };
       build(go);
     };

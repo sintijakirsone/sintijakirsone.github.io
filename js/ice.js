@@ -1,7 +1,6 @@
 /* =========================================================
    ICE — frost flowers drawn in code, freeze / melt
-   animations, and synthesized freezing sounds.
-   No image or sound files needed.
+   animations. No image files needed.
    Look: big see-through frost bursts of fine needles.
    Grey background: white frost. White background: white frost
    on a pale grey frosted glass ("daylight window").
@@ -246,7 +245,6 @@
       var fromBottom = 1 - Math.max(0, Math.min(1, f.y / H));
       addFlower(layer, f, between(r, 0, 360), 0.3 + fromBottom * 2 + between(r, 0, 0.3), between(r, 1.6, 2.4));
     });
-    sound.crackle(3.4);
   }
 
   // Gentle drifting (home page, after a while)
@@ -294,7 +292,6 @@
       el.style.transform = el.style.getPropertyValue("--base") + " scale(" + between(r, 0.3, 0.5).toFixed(2) + ")";
     });
     setTimeout(function () {
-      sound.melt();
       moving.forEach(function (el, i) {
         setTimeout(function () {
           el.classList.add("melt");
@@ -320,14 +317,12 @@
       addFlower(layer, f, between(r, 0, 360), 0.3 + Math.max(0, fromEdge) * 1.8 + between(r, 0, 0.3), between(r, 1.5, 2.2));
     });
     requestAnimationFrame(function () { layer.classList.add("is-frozen"); });
-    sound.crackle(4);
   }
 
   function meltFull(layer) {
     if (!layer.classList.contains("is-frozen")) return;
     layer.classList.remove("is-frozen");
     layer.classList.add("is-melting");
-    sound.melt();
     layer.querySelectorAll(".frost").forEach(function (el) {
       freezeTransform(el);
       el.classList.add("melt");
@@ -354,79 +349,6 @@
   function sprites() { return { ferns: [], stars: [], lightIdx: [], darkIdx: [] }; }
   function paintCrust(c, W, H, opts) { opts = opts || {}; paintGlass(c, W, H, opts.bg, opts.seed || 7, true, opts.scale || 1); }
 
-  /* =========================================================
-     SOUND — synthesized ice crackle and melting drips
-     ========================================================= */
-  var sound = (function () {
-    var ctx = null, noise = null, enabled = false;
-    function ensure() {
-      if (!ctx) {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return null;
-        ctx = new AC();
-        var len = ctx.sampleRate * 2;
-        noise = ctx.createBuffer(1, len, ctx.sampleRate);
-        var d = noise.getChannelData(0);
-        for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-      }
-      if (ctx.state === "suspended") ctx.resume();
-      return ctx;
-    }
-    function grain(at, dur, freq, q, gain, type) {
-      var src = ctx.createBufferSource();
-      src.buffer = noise;
-      var f = ctx.createBiquadFilter();
-      f.type = type || "bandpass"; f.frequency.value = freq; f.Q.value = q;
-      var g = ctx.createGain();
-      g.gain.setValueAtTime(0.0001, at);
-      g.gain.exponentialRampToValueAtTime(gain, at + 0.002);
-      g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
-      src.connect(f); f.connect(g); g.connect(ctx.destination);
-      src.start(at, Math.random() * 1.5, dur + 0.02);
-    }
-    function crackle(duration) {
-      if (!enabled || !ensure()) return;
-      var now = ctx.currentTime + 0.05;
-      var n = Math.round(duration * 45);
-      for (var i = 0; i < n; i++) {
-        var t = now + duration * Math.pow(Math.random(), 1.5);
-        grain(t, 0.004 + Math.random() * 0.025, 2500 + Math.random() * 7000, 1 + Math.random() * 6, 0.04 + Math.random() * 0.22);
-        if (Math.random() < 0.08) grain(t, 0.05 + Math.random() * 0.06, 500 + Math.random() * 900, 3, 0.18);
-      }
-      // faint frosty hiss
-      var src = ctx.createBufferSource(); src.buffer = noise; src.loop = true;
-      var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 6500;
-      var g = ctx.createGain();
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.linearRampToValueAtTime(0.025, now + duration * 0.3);
-      g.gain.linearRampToValueAtTime(0.0001, now + duration);
-      src.connect(hp); hp.connect(g); g.connect(ctx.destination);
-      src.start(now); src.stop(now + duration + 0.1);
-    }
-    function melt() {
-      if (!enabled || !ensure()) return;
-      var now = ctx.currentTime + 0.05;
-      for (var i = 0; i < 7; i++) {
-        var t = now + Math.random() * 1.6;
-        var o = ctx.createOscillator(); o.type = "sine";
-        var f0 = 900 + Math.random() * 900;
-        o.frequency.setValueAtTime(f0, t);
-        o.frequency.exponentialRampToValueAtTime(f0 * 0.55, t + 0.12);
-        var g = ctx.createGain();
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.09, t + 0.008);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
-        o.connect(g); g.connect(ctx.destination);
-        o.start(t); o.stop(t + 0.25);
-      }
-    }
-    return {
-      crackle: crackle,
-      melt: melt,
-      setEnabled: function (on) { enabled = !!on; if (on) ensure(); },
-      isEnabled: function () { return enabled; }
-    };
-  })();
 
   window.Ice = {
     sprites: sprites,
@@ -438,7 +360,6 @@
     freezeFull: freezeFull,
     meltFull: meltFull,
     clear: clear,
-    retheme: retheme,
-    sound: sound
+    retheme: retheme
   };
 })();
