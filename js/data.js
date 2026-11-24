@@ -88,8 +88,7 @@ window.WORKS = [
     "images/works/piepuskot/piepuskot789.png",
     "images/works/piepuskot/piepuskot10.jpg"
   ],
-  ],
-  video: null,
+  video: { link: "https://youtu.be/3LB8MtDiuQA" },
   text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
   publications: []
 },
