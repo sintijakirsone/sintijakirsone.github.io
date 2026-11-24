@@ -362,6 +362,7 @@ var CONTACT = {
       var set = window.Ice.sprites(bg);
       var urls = set.ferns.concat(set.stars);
       var imgs = [], left = urls.length;
+      if (!left) { cb({ ferns: [], stars: [] }); return; }   // new frost is drawn directly, nothing to load
       urls.forEach(function (u, i) {
         var im = new Image();
         im.onload = im.onerror = function () { if (--left === 0) cb({ ferns: imgs.slice(0, set.ferns.length), stars: imgs.slice(set.ferns.length) }); };
@@ -396,7 +397,46 @@ var CONTACT = {
       g.addColorStop(0, white ? "rgba(168,188,206,0.55)" : "rgba(200,216,230,0.16)");
       g.addColorStop(1, white ? "rgba(150,174,196,0.72)" : "rgba(210,226,240,0.30)");
       f.fillStyle = g; f.fillRect(0, 0, W, H);
+      if (window.Ice.paintWindow) {   // blue window frost with rosette clusters
+        f.save(); f.lineCap = "round";
+        window.Ice.paintWindow(f, W, H, { bg: white ? "white" : "grey", seed: 2026, scale: dpr });
+        f.restore();
+        return;
+      }
       var r = seeded(2026);
+      // new window frost: frosted glass with packed rosettes, light above and dark below
+      var set = window.Ice.sprites(document.documentElement.getAttribute("data-bg") || "grey");
+      if (window.Ice.paintCrust && set.darkIdx) {
+        f.save(); f.lineCap = "round";
+        window.Ice.paintCrust(f, W, H, { bg: white ? "white" : "grey", seed: 2026, scale: dpr });
+        f.restore();
+        var size = Math.max(70 * dpr, Math.min(W, H) / 4.2);
+        var step = size * 0.62;
+        var holes = [];
+        for (var row = 0; row * step < H + size; row++) {
+          for (var col = 0; col * step < W + size; col++) {
+            var x = (col + (row % 2) * 0.5) * step + (r() - 0.5) * step * 0.6;
+            var y = H - row * step + (r() - 0.5) * step * 0.6;
+            var depth = Math.max(0, Math.min(1, y / H));
+            var dark = r() < Math.max(0, Math.min(0.85, (depth - 0.35) * 1.6));
+            var list = dark ? set.darkIdx : set.lightIdx;
+            var img = images.stars[list[Math.floor(r() * list.length)]];
+            var w = size * Math.pow(0.55 + r() * 0.7, 1.4);
+            f.save(); f.translate(x, y); f.rotate(r() * Math.PI * 2);
+            f.drawImage(img, -w / 2, -w / 2, w, w);
+            f.restore();
+            holes.push({ x: x, y: y, r: w * 0.42 });
+          }
+        }
+        if (window.Ice.paintVeil) {   // white frost between and over the rosettes
+          var veil = document.createElement("canvas");
+          veil.width = W; veil.height = H;
+          var vc = veil.getContext("2d"); vc.lineCap = "round";
+          window.Ice.paintVeil(vc, W, H, { bg: white ? "white" : "grey", seed: 2026, scale: dpr, holes: holes });
+          f.drawImage(veil, 0, 0);
+        }
+        return;
+      }
       var unit = Math.max(W, H) / 5.5;
       function put(img, x, y, w, rot) {
         var h = w * img.height / img.width;

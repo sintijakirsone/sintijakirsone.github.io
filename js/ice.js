@@ -2,6 +2,9 @@
    ICE — frost flowers drawn in code, freeze / melt
    animations, and synthesized freezing sounds.
    No image or sound files needed.
+   Look: big see-through frost bursts of fine needles.
+   Grey background: white frost. White background: white frost
+   on a pale grey frosted glass ("daylight window").
    ========================================================= */
 (function () {
   "use strict";
@@ -19,190 +22,246 @@
   }
   function between(r, a, b) { return a + r() * (b - a); }
 
-  /* ---------- palettes per background ---------- */
+  /* ---------- animation styles (kept here, so style.css stays untouched) ---------- */
+  var css = document.createElement("style");
+  css.textContent =
+    ".frost.flower { transform-origin: 50% 50%; }" +
+    ".frost.flower canvas { display: block; width: 100%; height: 100%; }" +
+    ".frost.bloom { animation: frost-bloom var(--dur, 2s) cubic-bezier(.2,.7,.25,1) var(--delay, 0s) both; }" +
+    "@keyframes frost-bloom { 0% { transform: var(--base) scale(0.08); opacity: 0; } 35% { opacity: 1; } 100% { transform: var(--base) scale(1); opacity: 1; } }" +
+    ".frost.crust { transform: none !important; left: 0; top: 0; width: 100%; height: 100%; }" +
+    ".frost.crust canvas { display: block; width: 100%; height: 100%; }" +
+    ".frost.crust.rise { animation: frost-rise var(--dur, 3s) cubic-bezier(.3,.6,.3,1) var(--delay, 0s) both; }" +
+    "@keyframes frost-rise { 0% { clip-path: inset(100% 0 0 0); } 100% { clip-path: inset(0 0 0 0); } }" +
+    ".frost.crust.fadein { animation: frost-fadein var(--dur, 2s) ease var(--delay, 0s) both; }" +
+    "@keyframes frost-fadein { 0% { opacity: 0; } 100% { opacity: 1; } }" +
+    ".frost.crust.melt { transition: opacity 1.4s ease !important; opacity: 0 !important; filter: none !important; }" +
+    "@media (prefers-reduced-motion: reduce) { .frost.bloom, .frost.crust.rise, .frost.crust.fadein { animation: none; } }";
+  document.head.appendChild(css);
+
+  /* =========================================================
+     COLOURS
+     ink:   colour of the needles      glow: soft light / shadow around them
+     boost: makes needles stronger     tint: frosted glass colour (null = none)
+     ========================================================= */
   var PALETTES = {
-    grey: [
-      { core: "rgba(238,245,252,", glow: "rgba(160,200,238,0.9)" },
-      { core: "rgba(230,240,250,", glow: "rgba(150,190,235,0.85)" },
-      { core: "rgba(150,188,240,", glow: "rgba(70,120,210,0.95)" }   // blue crystals
-    ],
-    white: [
-      { core: "rgba(255,255,255,", glow: "rgba(95,120,145,0.8)" },
-      { core: "rgba(250,252,255,", glow: "rgba(120,145,170,0.75)" },
-      { core: "rgba(205,225,248,", glow: "rgba(70,105,160,0.8)" }
-    ]
+    grey:  { ink: "rgba(238,242,246,", glow: "rgba(205,215,225,0.8)", boost: 1,    frost: "rgba(238,242,246,", tint: null },
+    white: { ink: "rgba(255,255,255,", glow: "rgba(88,94,102,0.75)",  boost: 1.25, frost: "rgba(255,255,255,", tint: "rgba(172,177,184," }
   };
-
-  /* ---------- drawing ---------- */
-  function strokeBranch(ctx, r, x, y, ang, len, width, depth, alpha) {
-    var steps = Math.max(5, Math.round(len / 7));
-    var stepLen = len / steps;
-    var bend = between(r, -0.012, 0.012);
-    var spawnEvery = depth >= 2 ? 4 : 3;
-    var side = r() < 0.5 ? 1 : -1;
-    for (var i = 0; i < steps; i++) {
-      var t = i / steps;
-      var nx = x + Math.cos(ang) * stepLen;
-      var ny = y + Math.sin(ang) * stepLen;
-      ctx.lineWidth = Math.max(0.45, width * (1 - t * 0.75));
-      ctx.strokeStyle = ctx.__core + (alpha * (1 - t * 0.35)).toFixed(3) + ")";
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
-
-      if (depth > 0 && i > 1 && i % spawnEvery === 0) {
-        var subLen = len * (0.42 * (1 - t) + 0.05) * between(r, 0.7, 1.1);
-        var spread = between(r, 0.85, 1.12);
-        var both = depth >= 2 || r() < 0.85;
-        strokeBranch(ctx, r, nx, ny, ang + side * spread, subLen, width * 0.62, depth - 1, alpha * 0.92);
-        if (both) strokeBranch(ctx, r, nx, ny, ang - side * spread, subLen * between(r, 0.75, 1.05), width * 0.62, depth - 1, alpha * 0.92);
-        side = -side;
-      } else if (depth === 0 && i % 2 === 0 && t < 0.8) {
-        // fine feathery barbs
-        var bl = (1 - t) * between(r, 3, 7);
-        ctx.lineWidth = 0.45;
-        ctx.strokeStyle = ctx.__core + (alpha * 0.7).toFixed(3) + ")";
-        ctx.beginPath();
-        ctx.moveTo(nx, ny); ctx.lineTo(nx + Math.cos(ang + 0.9) * bl, ny + Math.sin(ang + 0.9) * bl);
-        ctx.moveTo(nx, ny); ctx.lineTo(nx + Math.cos(ang - 0.9) * bl, ny + Math.sin(ang - 0.9) * bl);
-        ctx.stroke();
-      }
-      x = nx; y = ny; ang += bend;
-    }
-  }
-
-  function finish(lines, W, H, glow) {
-    var out = document.createElement("canvas");
-    out.width = W; out.height = H;
-    var o = out.getContext("2d");
-    o.shadowColor = glow;
-    o.shadowBlur = 7;
-    o.drawImage(lines, 0, 0);
-    o.shadowBlur = 0;
-    o.drawImage(lines, 0, 0);
-    return out.toDataURL("image/png");
-  }
-
-  // fern-like frost growing up from the bottom edge
-  function makeFern(seed, pal) {
-    var W = 440, H = 600, r = rng(seed);
-    var c = document.createElement("canvas");
-    c.width = W; c.height = H;
-    var ctx = c.getContext("2d");
-    ctx.lineCap = "round";
-    ctx.__core = pal.core;
-    var stems = 2 + Math.floor(r() * 3);
-    for (var s = 0; s < stems; s++) {
-      var a = -Math.PI / 2 + between(r, -0.95, 0.95);
-      var off = Math.abs(a + Math.PI / 2);
-      var len = H * between(r, 0.5, 0.92) * (1 - off * 0.32);
-      strokeBranch(ctx, r, W / 2 + between(r, -40, 40), H - 6, a, len, between(r, 1.8, 2.8), 2, between(r, 0.75, 0.95));
-    }
-    return finish(c, W, H, pal.glow);
-  }
-
-  // six-armed star crystal
-  function makeStar(seed, pal) {
-    var S = 360, r = rng(seed);
-    var c = document.createElement("canvas");
-    c.width = S; c.height = S;
-    var ctx = c.getContext("2d");
-    ctx.lineCap = "round";
-    ctx.__core = pal.core;
-    var armLen = S * between(r, 0.36, 0.46);
-    var armSeed = Math.floor(r() * 1e9);
-    var turn = r() * Math.PI;
-    for (var k = 0; k < 6; k++) {
-      var ar = rng(armSeed); // same arm 6 times = symmetric crystal
-      strokeBranch(ctx, ar, S / 2, S / 2, turn + k * Math.PI / 3, armLen, 2.2, 2, 0.95);
-    }
-    return finish(c, S, S, pal.glow);
-  }
-
-  var cache = {};
-  function sprites(bg) {
-    bg = bg === "white" ? "white" : "grey";
-    if (cache[bg]) return cache[bg];
-    var pals = PALETTES[bg];
-    var set = { ferns: [], stars: [] };
-    for (var i = 0; i < 7; i++) set.ferns.push(makeFern(101 + i * 17, pals[i % 2]));
-    for (var j = 0; j < 4; j++) set.stars.push(makeStar(707 + j * 31, pals[j % 2 === 0 ? 2 : 0]));
-    cache[bg] = set;
-    return set;
-  }
-
-  /* ---------- placing frost elements ---------- */
+  function pal(bg) { return PALETTES[bg === "white" ? "white" : "grey"]; }
   function currentBg() { return document.documentElement.getAttribute("data-bg") || "grey"; }
 
-  function addFrost(layer, opts) {
-    var set = sprites(currentBg());
-    var list = opts.kind === "star" ? set.stars : set.ferns;
-    var idx = opts.idx % list.length;
+  function line(c, P, x1, y1, x2, y2, w, a) {
+    c.strokeStyle = P.ink + Math.min(1, a * P.boost).toFixed(3) + ")";
+    c.lineWidth = w;
+    c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+  }
+
+  /* =========================================================
+     FROST FLOWER — fine needles from one centre, in petals of
+     different lengths and brightness, with fluffy tips and a glow.
+     Returns a square canvas, R = radius in canvas pixels.
+     ========================================================= */
+  function drawFlower(R, P, seed, density) {
+    var S = Math.ceil(R * 2.3);
+    var cv = document.createElement("canvas"); cv.width = cv.height = S;
+    var c = cv.getContext("2d"); c.lineCap = "round";
+    var r = rng(seed), cx = S / 2, cy = S / 2;
+    var petals = [], a = 0;
+    while (a < 6.283) {
+      var pw = between(r, 0.12, 0.42);
+      petals.push({ from: a, to: Math.min(6.283, a + pw), len: between(r, 0.55, 1), glow: between(r, 0.45, 1) });
+      a += pw;
+    }
+    var count = Math.round(6.283 * R * 0.6 * (density || 1));
+    for (var i = 0; i < count; i++) {
+      var ang = r() * 6.283, pet = petals[0];
+      for (var k = 0; k < petals.length; k++) if (ang >= petals[k].from && ang <= petals[k].to) { pet = petals[k]; break; }
+      var mid = (ang - pet.from) / Math.max(0.001, pet.to - pet.from);
+      var L = R * pet.len * (0.82 + 0.18 * Math.sin(mid * Math.PI)) * between(r, 0.72, 1.04);
+      var r0 = R * Math.pow(r(), 1.6) * 0.32, ca = Math.cos(ang), sa = Math.sin(ang), pa = pet.glow;
+      var xm = cx + ca * L * 0.55, ym = cy + sa * L * 0.55;
+      line(c, P, cx + ca * r0, cy + sa * r0, xm, ym, between(r, 0.45, 0.85), between(r, 0.14, 0.34) * pa);
+      line(c, P, xm, ym, cx + ca * L, cy + sa * L, between(r, 0.35, 0.75), between(r, 0.4, 0.85) * pa);
+      if (r() < 0.55) {   // fluffy tips
+        var tb = L * between(r, 0.06, 0.14), bx = cx + ca * L * 0.9, by = cy + sa * L * 0.9;
+        line(c, P, bx, by, bx + Math.cos(ang + 0.32) * tb, by + Math.sin(ang + 0.32) * tb, 0.45, 0.6);
+        line(c, P, bx, by, bx + Math.cos(ang - 0.32) * tb, by + Math.sin(ang - 0.32) * tb, 0.45, 0.6);
+      }
+    }
+    var g = c.createRadialGradient(cx, cy, 0, cx, cy, R * 0.45);
+    g.addColorStop(0, P.ink + "0.22)"); g.addColorStop(1, P.ink + "0)");
+    c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * 0.45, 0, 6.283); c.fill();
+    // glow (light on grey, soft shadow on white)
+    var out = document.createElement("canvas"); out.width = out.height = S;
+    var o = out.getContext("2d");
+    o.shadowColor = P.glow; o.shadowBlur = R / 30 + 4;
+    o.drawImage(cv, 0, 0); o.shadowBlur = 0; o.drawImage(cv, 0, 0);
+    return out;
+  }
+
+  /* =========================================================
+     THE GLASS between the flowers: pale frosted glass (white
+     background only), soft mist, fine feathery frost and drips.
+     full = covers the whole screen (idle freeze, Contact window)
+     ========================================================= */
+  function paintGlass(c, W, H, bg, seed, full, scale) {
+    var P = pal(bg), r = rng(seed), k = scale || 1, top = full ? 0 : H * 0.18;
+    c.save(); c.lineCap = "round";
+    if (P.tint) {
+      var tg = c.createLinearGradient(0, top, 0, H);
+      tg.addColorStop(0, P.tint + (full ? "0.5)" : "0)"));
+      tg.addColorStop(0.35, P.tint + (full ? "0.65)" : "0.55)"));
+      tg.addColorStop(1, P.tint + "0.85)");
+      c.fillStyle = tg; c.fillRect(0, 0, W, H);
+    }
+    var ink = P.frost, strong = bg !== "white" || !!P.tint;
+    var g = c.createLinearGradient(0, top, 0, H);
+    g.addColorStop(0, ink + (full ? "0.03)" : "0)")); g.addColorStop(1, ink + "0.08)");
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    // misty patches, lower down
+    for (var m = 0; m < 40; m++) {
+      var mx = r() * W, my = full ? r() * H : H * 0.5 + r() * H * 0.6, mr = between(r, 90, 220) * k;
+      var gg = c.createRadialGradient(mx, my, 0, mx, my, mr);
+      gg.addColorStop(0, ink + between(r, 0.04, 0.09).toFixed(3) + ")"); gg.addColorStop(1, ink + "0)");
+      c.fillStyle = gg; c.fillRect(mx - mr, my - mr, mr * 2, mr * 2);
+    }
+    // fine feathery frost crystals, denser towards the bottom
+    var n = Math.round(4200 * (W * H) / (1440 * 860 * k * k));
+    for (var i = 0; i < n; i++) {
+      var px = r() * W, py = top + Math.pow(r(), 0.55) * (H - top) * 1.05;
+      if (!full && r() > (py - top) / (H - top) + 0.1) continue;
+      var L = between(r, 5, 20) * k, arms = 3 + Math.floor(r() * 4), t0 = r() * 6.28, a0 = strong ? between(r, 0.08, 0.2) : between(r, 0.1, 0.24);
+      for (var j = 0; j < arms; j++) {
+        var a = t0 + j * 6.28 / arms + between(r, -0.3, 0.3), ll = L * between(r, 0.5, 1);
+        var ex = px + Math.cos(a) * ll, ey = py + Math.sin(a) * ll;
+        line(c, P, px, py, ex, ey, 0.55 * k, a0);
+        for (var q = 1; q < 4; q++) {
+          var t = q / 4, bx = px + (ex - px) * t, by = py + (ey - py) * t, bl = ll * 0.25 * (1 - t);
+          line(c, P, bx, by, bx + Math.cos(a + 0.7) * bl, by + Math.sin(a + 0.7) * bl, 0.4 * k, a0 * 0.8);
+          line(c, P, bx, by, bx + Math.cos(a - 0.7) * bl, by + Math.sin(a - 0.7) * bl, 0.4 * k, a0 * 0.8);
+        }
+      }
+    }
+    // drips
+    for (var d = 0; d < 60; d++) {
+      var dx = r() * W, y0 = between(r, H * 0.45, H * 0.9), len = (H - y0) * between(r, 0.3, 1);
+      var lg = c.createLinearGradient(0, y0, 0, y0 + len);
+      lg.addColorStop(0, ink + "0)"); lg.addColorStop(0.4, ink + between(r, 0.04, 0.1).toFixed(3) + ")"); lg.addColorStop(1, ink + "0)");
+      c.fillStyle = lg; c.fillRect(dx, y0, between(r, 1, 3) * k, len);
+    }
+    c.restore();
+  }
+
+  /* =========================================================
+     WHERE THE FLOWERS GO — 9 big ones in different sizes, close
+     together in the lower part (some partly off-screen), and a
+     few small ones. Designed on a 1440 × 860 screen, then scaled.
+     ========================================================= */
+  var HOME_BIG = [[90,690,270],[380,780,190],[600,560,240],[880,760,280],[1150,590,200],[1400,780,250],[230,430,170],[1330,380,150],[790,350,130]];
+  var HOME_SMALL = [[470,400],[1040,420],[20,240],[1210,820]];
+  var FULL_BIG = [[110,140,230],[520,90,180],[930,170,260],[1340,110,200],[300,460,250],[760,480,210],[1190,470,270],[60,780,220],[560,800,260],[1000,820,200],[1420,760,240]];
+  var FULL_SMALL = [[700,250],[1100,330],[420,640],[1300,600],[210,300]];
+
+  function layout(W, H, seed, full) {
+    var r = rng(seed), sx = W / 1440, sy = H / 860;
+    var ks = Math.max(0.45, Math.min(sx, sy) * 1.05);     // flower size scale (keeps them big on phones)
+    var out = [];
+    (full ? FULL_BIG : HOME_BIG).forEach(function (p, i) {
+      out.push({ x: (p[0] + between(r, -20, 20)) * sx, y: (p[1] + between(r, -20, 20)) * sy, R: p[2] * between(r, 0.92, 1.08) * ks, seed: seed * 31 + i, density: 1 });
+    });
+    (full ? FULL_SMALL : HOME_SMALL).forEach(function (p, i) {
+      out.push({ x: (p[0] + between(r, -20, 20)) * sx, y: (p[1] + between(r, -20, 20)) * sy, R: between(r, 50, 80) * ks, seed: seed * 31 + 50 + i, density: 1.3 });
+    });
+    out.sort(function (a, b) { return a.y - b.y; });
+    return out;
+  }
+
+  /* ---------- one picture with glass + flowers (Contact page window) ---------- */
+  function paintScene(c, W, H, opts) {
+    opts = opts || {};
+    var bg = opts.bg === "white" ? "white" : "grey", P = pal(bg), seed = opts.seed || 7;
+    var k = opts.scale || 1;
+    paintGlass(c, W, H, bg, seed, true, k);
+    var r = rng(seed + 9);
+    layout(W / k, H / k, seed, true).forEach(function (f) {
+      var fl = drawFlower(f.R * k * 0.8, P, f.seed, f.density);
+      c.save(); c.translate(f.x * k, f.y * k); c.rotate(r() * 6.28);
+      c.drawImage(fl, -fl.width / 2, -fl.height / 2); c.restore();
+    });
+  }
+  function paintWindow(c, W, H, opts) { paintScene(c, W, H, opts); }
+
+  /* =========================================================
+     PLACING FROST ON THE PAGE
+     ========================================================= */
+  function spriteScale() { return Math.min(1.5, window.devicePixelRatio || 1); }
+
+  function addFlower(layer, f, rot, delay, dur) {
+    var k = spriteScale();
     var el = document.createElement("div");
-    el.className = "frost";
-    el.dataset.kind = opts.kind;
-    el.dataset.idx = idx;
-    var img = document.createElement("img");
-    img.alt = "";
-    img.src = list[idx];
-    el.appendChild(img);
-    var aspect = opts.kind === "star" ? 1 : 600 / 440;
-    el.style.width = opts.w + "px";
-    el.style.left = opts.x + "px";
-    el.style.top = (opts.y - opts.w * aspect) + "px";  // y = where the base sits
-    el.style.setProperty("--base", "translateX(-50%) rotate(" + (opts.rot || 0) + "deg)");
-    el.style.setProperty("--dur", (opts.dur || 2.6) + "s");
-    el.style.setProperty("--delay", (opts.delay || 0) + "s");
-    if (opts.origin) el.style.transformOrigin = opts.origin;
+    el.className = "frost flower";
+    var cv = drawFlower(f.R * k, pal(currentBg()), f.seed, f.density);
+    el.appendChild(cv);
+    var size = cv.width / k;
+    el.style.width = size + "px"; el.style.height = size + "px";
+    el.style.left = f.x + "px"; el.style.top = f.y + "px";
+    el.style.setProperty("--base", "translate(-50%,-50%) rotate(" + rot.toFixed(1) + "deg)");
+    el.style.setProperty("--delay", delay.toFixed(2) + "s");
+    el.style.setProperty("--dur", dur.toFixed(2) + "s");
+    el.__flower = f;
     layer.appendChild(el);
-    el.classList.add("grow");
+    el.classList.add("bloom");
     return el;
   }
 
-  // Bottom half freezes over (home page)
+  function addGlass(layer, W, H, seed, full, anim, delay, dur) {
+    var el = document.createElement("div");
+    el.className = "frost crust";
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var c = document.createElement("canvas");
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    el.appendChild(c);
+    el.__paint = function () {
+      var ctx = c.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      paintGlass(ctx, W, H, currentBg(), seed, full, 1);
+    };
+    el.__paint();
+    el.style.setProperty("--delay", (delay || 0) + "s");
+    el.style.setProperty("--dur", (dur || 3) + "s");
+    layer.insertBefore(el, layer.firstChild);
+    el.classList.add(anim || "rise");
+    return el;
+  }
+
+  /* ---------- home page: big frost flowers grow from the bottom up ---------- */
   function freezeBottom(layer) {
     clear(layer);
     var W = window.innerWidth, H = window.innerHeight;
-    var r = rng(Date.now() & 0xffff);
-    var mobile = W < 760;
-    var n = Math.ceil(W / (mobile ? 80 : 120)) + 2;
-    for (var i = 0; i < n; i++) {
-      var x = (i / (n - 1)) * W + between(r, -30, 30);
-      var w = between(r, 0.32, 0.5) * H * (mobile ? 0.62 : 0.78);
-      addFrost(layer, {
-        kind: "fern", idx: i, x: x, y: H + w * 0.06, w: w,
-        rot: between(r, -14, 14), delay: between(r, 0, 1.4), dur: between(r, 2.2, 3.4)
-      });
-    }
-    // a second, taller row behind for density
-    for (var j = 0; j < Math.ceil(n * 0.4); j++) {
-      var x2 = between(r, 0, W);
-      var w2 = between(r, 0.42, 0.62) * H * (mobile ? 0.6 : 0.75);
-      addFrost(layer, {
-        kind: "fern", idx: j + 3, x: x2, y: H + w2 * 0.05, w: w2,
-        rot: between(r, -22, 22), delay: between(r, 0.4, 1.9), dur: between(r, 2.6, 3.8)
-      });
-    }
-    for (var k = 0; k < (mobile ? 2 : 4); k++) {
-      var sw = between(r, 0.14, 0.24) * H;
-      addFrost(layer, {
-        kind: "star", idx: k, x: between(r, 0.1, 0.95) * W, y: between(r, 0.72, 0.95) * H + sw / 2, w: sw,
-        rot: between(r, 0, 60), delay: between(r, 1.0, 2.2), dur: 2.2, origin: "50% 50%"
-      });
-    }
-    sound.crackle(3.2);
+    var seed = Date.now() & 0xffff, r = rng(seed + 3);
+    addGlass(layer, W, H, seed, false, "fadein", 0, 2.6);   // background frost softly fades in
+    layout(W, H, seed, false).forEach(function (f) {
+      var fromBottom = 1 - Math.max(0, Math.min(1, f.y / H));
+      addFlower(layer, f, between(r, 0, 360), 0.3 + fromBottom * 2 + between(r, 0, 0.3), between(r, 1.6, 2.4));
+    });
+    sound.crackle(3.4);
   }
 
   // Gentle drifting (home page, after a while)
   function drift(layer) {
     var r = rng(4242);
     layer.querySelectorAll(".frost").forEach(function (el) {
-      el.classList.remove("grow");
-      el.style.setProperty("--sway", between(r, 7, 13).toFixed(1) + "s");
-      el.style.setProperty("--dx1", between(r, -18, 18).toFixed(0) + "px");
-      el.style.setProperty("--dy1", between(r, -12, 4).toFixed(0) + "px");
-      el.style.setProperty("--dx2", between(r, -18, 18).toFixed(0) + "px");
-      el.style.setProperty("--dy2", between(r, -8, 6).toFixed(0) + "px");
-      el.style.setProperty("--r1", between(r, -4, 4).toFixed(1) + "deg");
-      el.style.setProperty("--r2", between(r, -4, 4).toFixed(1) + "deg");
+      if (el.classList.contains("crust")) return;
+      el.classList.remove("grow", "bloom");
+      el.style.setProperty("--sway", between(r, 9, 15).toFixed(1) + "s");
+      el.style.setProperty("--dx1", between(r, -8, 8).toFixed(0) + "px");
+      el.style.setProperty("--dy1", between(r, -6, 2).toFixed(0) + "px");
+      el.style.setProperty("--dx2", between(r, -8, 8).toFixed(0) + "px");
+      el.style.setProperty("--dy2", between(r, -4, 4).toFixed(0) + "px");
+      el.style.setProperty("--r1", between(r, -5, 5).toFixed(1) + "deg");
+      el.style.setProperty("--r2", between(r, -5, 5).toFixed(1) + "deg");
       el.style.animationDelay = (-between(r, 0, 6)).toFixed(1) + "s";
       el.classList.add("drift");
     });
@@ -211,11 +270,11 @@
   function freezeTransform(el) {
     // stop animations but keep the current look
     var base = el.style.getPropertyValue("--base");
-    el.classList.remove("grow", "drift");
+    el.classList.remove("grow", "drift", "bloom", "rise", "fadein");
     el.style.animation = "none";
     el.style.clipPath = "inset(0 0 0 0)";
     el.style.opacity = "1";
-    el.style.transform = base + " scale(1)";
+    if (!el.classList.contains("crust")) el.style.transform = base + " scale(1)";
     void el.offsetWidth;
   }
 
@@ -224,70 +283,42 @@
     var W = window.innerWidth, H = window.innerHeight;
     var r = rng(99);
     var items = Array.prototype.slice.call(layer.querySelectorAll(".frost"));
+    var moving = [];
     items.forEach(function (el) {
       freezeTransform(el);
+      if (el.classList.contains("crust")) { el.classList.add("melt"); return; }  // the glass just thaws
+      moving.push(el);
       el.classList.add("to-corner");
-      el.style.left = (W * between(r, 0.7, 1.02)) + "px";
-      el.style.top = (H * between(r, 0.38, 0.78)) + "px";
-      el.style.transform = el.style.getPropertyValue("--base") + " scale(" + between(r, 0.38, 0.62).toFixed(2) + ")";
+      el.style.left = (W * between(r, 0.72, 1.02)) + "px";
+      el.style.top = (H * between(r, 0.45, 0.85)) + "px";
+      el.style.transform = el.style.getPropertyValue("--base") + " scale(" + between(r, 0.3, 0.5).toFixed(2) + ")";
     });
     setTimeout(function () {
       sound.melt();
-      items.forEach(function (el, i) {
+      moving.forEach(function (el, i) {
         setTimeout(function () {
           el.classList.add("melt");
-          el.style.transform = el.style.getPropertyValue("--base") + " translateY(40px) scale(0.35)";
-        }, i * 25);
+          el.style.transform = el.style.getPropertyValue("--base") + " translateY(40px) scale(0.2)";
+        }, i * 40);
       });
     }, 1150);
-    setTimeout(function () { clear(layer); if (done) done(); }, 1150 + items.length * 25 + 1900);
+    setTimeout(function () { clear(layer); if (done) done(); }, 1150 + moving.length * 40 + 1900);
   }
 
   function clear(layer) { while (layer.firstChild) layer.removeChild(layer.firstChild); }
 
-  // Whole screen freezes over (idle)
+  /* ---------- whole screen freezes over (after 15 s without movement) ---------- */
   function freezeFull(layer) {
     clear(layer);
     layer.classList.remove("is-melting");
-    var glass = document.createElement("div");
-    glass.className = "glass";
-    layer.appendChild(glass);
     var W = window.innerWidth, H = window.innerHeight;
-    var r = rng(Date.now() & 0xffff);
-    var size = Math.max(W, H);
-    var unit = Math.max(150, size / 7);
-    var idx = 0;
-    // from each edge inward
-    var edges = [
-      { n: Math.ceil(W / unit) + 1, pos: function (t) { return [t * W, H]; }, rot: 0 },
-      { n: Math.ceil(W / unit) + 1, pos: function (t) { return [t * W, 0]; }, rot: 180 },
-      { n: Math.ceil(H / unit) + 1, pos: function (t) { return [0, t * H]; }, rot: 90 },
-      { n: Math.ceil(H / unit) + 1, pos: function (t) { return [W, t * H]; }, rot: -90 }
-    ];
-    edges.forEach(function (e) {
-      for (var i = 0; i < e.n; i++) {
-        var p = e.pos(i / (e.n - 1) + between(r, -0.04, 0.04));
-        var w = unit * between(r, 1.3, 2.1);
-        var aspect = 600 / 440;
-        var el = addFrost(layer, {
-          kind: "fern", idx: idx++, x: p[0], y: p[1], w: w,
-          rot: e.rot + between(r, -25, 25), delay: between(r, 0, 0.9), dur: between(r, 2.4, 3.4)
-        });
-        // anchor the base on the edge point
-        el.style.top = (p[1] - w * aspect) + "px";
-      }
+    var seed = Date.now() & 0xffff, r = rng(seed + 3);
+    addGlass(layer, W, H, seed, true, "fadein", 0, 2.2);
+    layout(W, H, seed, true).forEach(function (f) {
+      // frost creeps in from the edges of the screen towards the middle
+      var fromEdge = Math.min(f.x, W - f.x, f.y, H - f.y) / (Math.min(W, H) / 2);
+      addFlower(layer, f, between(r, 0, 360), 0.3 + Math.max(0, fromEdge) * 1.8 + between(r, 0, 0.3), between(r, 1.5, 2.2));
     });
-    // fill the middle
-    var mid = Math.ceil((W * H) / (unit * unit * 2.6));
-    for (var m = 0; m < mid; m++) {
-      var mx = between(r, 0.1, 0.9) * W, my = between(r, 0.15, 0.95) * H;
-      var dist = Math.min(mx, W - mx, my, H - my) / (size / 2);
-      addFrost(layer, {
-        kind: r() < 0.22 ? "star" : "fern", idx: idx++, x: mx, y: my, w: unit * between(r, 1.0, 1.7),
-        rot: between(r, -180, 180), delay: 0.6 + dist * 2.2 + between(r, 0, 0.6), dur: between(r, 2.4, 3.2),
-        origin: "50% 100%"
-      });
-    }
     requestAnimationFrame(function () { layer.classList.add("is-frozen"); });
     sound.crackle(4);
   }
@@ -300,21 +331,28 @@
     layer.querySelectorAll(".frost").forEach(function (el) {
       freezeTransform(el);
       el.classList.add("melt");
-      el.style.transform = el.style.getPropertyValue("--base") + " translateY(30px) scale(0.92)";
+      if (!el.classList.contains("crust")) el.style.transform = el.style.getPropertyValue("--base") + " translateY(30px) scale(0.92)";
     });
     setTimeout(function () {
       if (!layer.classList.contains("is-frozen")) { clear(layer); layer.classList.remove("is-melting"); }
     }, 1900);
   }
 
-  // swap ice images when the background changes
+  // repaint the ice in the other colours when the background changes
   function retheme() {
-    var set = sprites(currentBg());
+    var P = pal(currentBg()), k = spriteScale();
     document.querySelectorAll(".frost").forEach(function (el) {
-      var list = el.dataset.kind === "star" ? set.stars : set.ferns;
-      el.firstChild.src = list[+el.dataset.idx % list.length];
+      if (el.classList.contains("crust")) { if (el.__paint) el.__paint(); return; }
+      if (el.__flower) {
+        var cv = drawFlower(el.__flower.R * k, P, el.__flower.seed, el.__flower.density);
+        el.replaceChild(cv, el.firstChild);
+      }
     });
   }
+
+  // kept so the Contact page code keeps working
+  function sprites() { return { ferns: [], stars: [], lightIdx: [], darkIdx: [] }; }
+  function paintCrust(c, W, H, opts) { opts = opts || {}; paintGlass(c, W, H, opts.bg, opts.seed || 7, true, opts.scale || 1); }
 
   /* =========================================================
      SOUND — synthesized ice crackle and melting drips
@@ -392,6 +430,8 @@
 
   window.Ice = {
     sprites: sprites,
+    paintCrust: paintCrust,
+    paintWindow: paintWindow,
     freezeBottom: freezeBottom,
     drift: drift,
     toCornerAndMelt: toCornerAndMelt,
