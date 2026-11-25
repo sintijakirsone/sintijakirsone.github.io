@@ -19,6 +19,52 @@
   }
 
   /* YouTube / Vimeo: find the video id in any kind of link */
+  /* ---------- labels (Latvian / English / Chinese) ---------- */
+  var LABELS = {
+    photo: { en: "Photo", lv: "Foto", zh: "" },
+    video: { en: "Video", lv: "Video", zh: "" },
+    prev:  { en: "Previous photo", lv: "Iepriekšējā bilde", zh: "" },
+    next:  { en: "Next photo", lv: "Nākamā bilde", zh: "" },
+    close: { en: "Close", lv: "Aizvērt", zh: "" }
+  };
+
+  /* ---------- styles for credits and the photo viewer ---------- */
+  var css = document.createElement("style");
+  css.textContent = [
+    ".credits { margin-top: 18px; font-size: 13px; line-height: 1.6; color: var(--fg-dim); }",
+    ".credits span { color: var(--fg); }",
+    ".lightbox { display: block; padding: 0; cursor: default; user-select: none; }",
+    ".lightbox .lb-stage { position: absolute; inset: 56px 72px 64px; display: grid; place-items: center; }",
+    ".lightbox .lb-stage img { max-width: calc(100vw - 150px); max-height: calc(100vh - 128px); width: auto; height: auto; object-fit: contain; cursor: default; }",
+    ".lightbox button { position: absolute; color: #f2f2ee; background: none; border: 0; cursor: pointer; padding: 12px; opacity: 0.8; transition: opacity .2s, color .2s; }",
+    ".lightbox button:hover { opacity: 1; color: var(--accent); }",
+    ".lightbox button svg { width: 34px; height: 34px; display: block; }",
+    ".lightbox .lb-prev { left: 10px; top: 50%; transform: translateY(-50%); }",
+    ".lightbox .lb-next { right: 10px; top: 50%; transform: translateY(-50%); }",
+    ".lightbox .lb-close { right: 10px; top: 8px; }",
+    ".lightbox .lb-close svg { width: 26px; height: 26px; }",
+    ".lightbox .lb-bar { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; padding: 0 16px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: #d8d8d2; }",
+    "@media (max-width: 760px) { .lightbox .lb-stage { inset: 52px 8px 60px; } .lightbox .lb-stage img { max-width: calc(100vw - 16px); max-height: calc(100vh - 120px); } .lightbox .lb-prev, .lightbox .lb-next { top: auto; bottom: 6px; transform: none; } }"
+  ].join("\n");
+  document.head.appendChild(css);
+
+  var ARROW_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4l-8 8 8 8"/></svg>';
+  var ARROW_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>';
+  var CROSS   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+
+  // credits can be one name ("Anna Ozola") or several (["Anna Ozola", "Jānis Bērziņš"])
+  function names(v) {
+    if (!v) return "";
+    return (Array.isArray(v) ? v : [v]).filter(Boolean).join(", ");
+  }
+  function creditsHtml(w) {
+    var c = w.credits || {};
+    var t = window.Site.t, rows = "";
+    if (names(c.photo)) rows += '<div>' + esc(t(LABELS.photo)) + ': <span>' + esc(names(c.photo)) + '</span></div>';
+    if (names(c.video) && w.video) rows += '<div>' + esc(t(LABELS.video)) + ': <span>' + esc(names(c.video)) + '</span></div>';
+    return rows ? '<div class="credits">' + rows + '</div>' : "";
+  }
+
   function youtubeId(url) {
     var m = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/.exec(url || "");
     return m ? m[1] : null;
@@ -88,7 +134,7 @@
         }).join("") + '</ul></div>';
     }
     var imgs = w.images.map(function (src, i) {
-      return '<img src="' + esc(src) + '" alt="' + esc(w.title) + ' — ' + (i + 1) + '" loading="' + (i < 2 ? "eager" : "lazy") + '">';
+      return '<img src="' + esc(src) + '" data-i="' + i + '" alt="' + esc(w.title) + ' — ' + (i + 1) + '" loading="' + (i < 2 ? "eager" : "lazy") + '">';
     });
 
     // neighbours for "next work"
@@ -103,6 +149,7 @@
             '<div>' + esc(w.year) + '</div>' +
             '<div>' + esc(t(w.materials)) + '</div>' +
             '<div class="tech-tags">' + w.techniques.map(function (x) { return esc(techName(x)); }).join(" / ") + '</div>' +
+            creditsHtml(w) +
           '</div>' +
           '<div class="work-text">' + text + '</div>' +
           pubs +
@@ -120,22 +167,67 @@
     });
     page.querySelectorAll(".media img").forEach(function (img) {
       if (img.closest(".video-box")) return;
-      img.addEventListener("click", function () { openLightbox(img.src, img.alt); });
+      img.addEventListener("click", function () { openGallery(w, +img.getAttribute("data-i") || 0); });
     });
     window.scrollTo(0, 0);
   }
 
-  function openLightbox(src, alt) {
+  /* ---------- photo viewer: arrows, keyboard and swiping ---------- */
+  function openGallery(w, start) {
+    var list = w.images, i = start, t = window.Site.t;
     var box = document.createElement("div");
     box.className = "lightbox";
     box.setAttribute("role", "dialog");
-    box.setAttribute("aria-label", alt);
-    box.innerHTML = '<img src="' + esc(src) + '" alt="' + esc(alt) + '">';
-    function close() { box.remove(); document.removeEventListener("keydown", onKey); }
-    function onKey(e) { if (e.key === "Escape") close(); }
-    box.addEventListener("click", close);
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", w.title);
+    var many = list.length > 1;
+    box.innerHTML =
+      '<div class="lb-stage"><img alt=""></div>' +
+      (many ? '<button type="button" class="lb-prev" aria-label="' + esc(t(LABELS.prev)) + '">' + ARROW_L + '</button>' +
+              '<button type="button" class="lb-next" aria-label="' + esc(t(LABELS.next)) + '">' + ARROW_R + '</button>' : '') +
+      '<button type="button" class="lb-close" aria-label="' + esc(t(LABELS.close)) + '">' + CROSS + '</button>' +
+      '<div class="lb-bar"><span class="lb-count"></span><span class="lb-credit"></span></div>';
+    var img = box.querySelector(".lb-stage img");
+    var c = w.credits || {};
+    function show(n) {
+      i = (n + list.length) % list.length;
+      img.src = list[i];
+      img.alt = w.title + " — " + (i + 1);
+      box.querySelector(".lb-count").textContent = many ? (i + 1) + " / " + list.length : "";
+      box.querySelector(".lb-credit").textContent = names(c.photo) ? t(LABELS.photo) + ": " + names(c.photo) : "";
+      // load the neighbours early so switching is instant
+      [i + 1, i - 1].forEach(function (k) { var p = new Image(); p.src = list[(k + list.length) % list.length]; });
+    }
+    function close() {
+      box.remove();
+      document.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = "";
+    }
+    function onKey(e) {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight" && many) show(i + 1);
+      else if (e.key === "ArrowLeft" && many) show(i - 1);
+    }
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (b && b.classList.contains("lb-prev")) show(i - 1);
+      else if (b && b.classList.contains("lb-next")) show(i + 1);
+      else if (b && b.classList.contains("lb-close")) close();
+      else if (!e.target.closest(".lb-stage img")) close();   // click beside the photo closes
+    });
+    // swipe left / right on phones
+    var x0 = null;
+    box.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    box.addEventListener("touchend", function (e) {
+      if (x0 === null || !many) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    });
     document.addEventListener("keydown", onKey);
+    document.documentElement.style.overflow = "hidden";
     document.body.appendChild(box);
+    show(i);
+    var nb = box.querySelector(".lb-next") || box.querySelector(".lb-close"); nb.focus();
   }
 
   document.addEventListener("DOMContentLoaded", function () {

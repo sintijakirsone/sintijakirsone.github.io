@@ -11,6 +11,9 @@
    • "video": null for no video, or
        { src: "videos/my-video.mp4" }          (your own file)
        { link: "https://vimeo.com/..." }      (link to Vimeo/YouTube)
+   • "credits": who made the photos and video, e.g.
+       credits: { photo: "Anna Ozola", video: ["Jānis Bērziņš", "Sintija Kirsone"] }
+     Leave a name out (or "") and that line is not shown.
    • Texts have "en", "lv" and "zh". If one is empty,
      English is shown instead.
    ========================================================= */
@@ -89,6 +92,7 @@ window.WORKS = [
     "images/works/piepuskot/piepuskot10.jpg"
   ],
   video: { link: "https://youtu.be/3LB8MtDiuQA" },
+  credits: { photo: "Vārds Uzvārds", video: "Vārds Uzvārds" },
   text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
   publications: []
 },
