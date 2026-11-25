@@ -146,7 +146,7 @@
       item.w = w;
       item.rot = (Math.random() * 14 - 7).toFixed(1);
       item.z = 1 + Math.floor(Math.random() * 20);
-      if (centeredId !== p.id) placeItem(item, entering ? i : -1);
+      if (centeredId !== p.id) placeItem(item, entering === "morph" ? -2 : entering ? i : -1);
     });
     if (centeredId) centerWork(centeredId, true);
   }
@@ -170,9 +170,39 @@
         el.style.transform = "rotate(" + item.rot + "deg)";
         el.classList.add("is-in");
       }, enterIndex * 90);
+    } else if (enterIndex === -2) {
+      // waiting for its frost flower: hidden and small, at its final place
+      el.style.transition = "none";
+      el.style.transform = "rotate(" + item.rot + "deg) scale(0.35)";
+      el.classList.remove("is-in");
+      void el.offsetWidth;
+      el.style.transition = "";
     } else {
       el.classList.add("is-in");
     }
+  }
+
+  // a cutout appears where its frost flower arrived
+  function revealItem(item) {
+    var el = item.el;
+    el.style.transition = "transform 0.9s cubic-bezier(.2,.8,.25,1), opacity 0.55s ease";
+    el.style.transform = "rotate(" + item.rot + "deg)";
+    el.classList.add("is-in");
+    setTimeout(function () { el.style.transition = ""; }, 950);
+  }
+
+  // build the pile, then let the frost flowers fly into it
+  function buildPileFromFrost(onDone) {
+    buildPile(-1);
+    layoutPile("morph");
+    applyFilter();
+    var list = preloaded.map(function (p) { return pileItems[p.id]; });
+    var targets = list.map(function (it) {
+      var p = preloaded.filter(function (q) { return pileItems[q.id] === it; })[0];
+      var h = it.w * p.ar;
+      return { x: it.x + it.w / 2, y: it.y + h / 2, size: Math.max(it.w, h) };
+    });
+    window.Ice.morphInto(iceLayer, targets, function (i) { if (route === "works") revealItem(list[i]); }, onDone);
   }
 
   function buildPile(delay) {
@@ -191,6 +221,7 @@
       pile.appendChild(el);
       pileItems[p.id] = { el: el };
     });
+    if (delay === -1) return;   // placed by buildPileFromFrost
     setTimeout(function () {
       if (route !== "works") return;
       layoutPile(true);
@@ -341,6 +372,13 @@
     if (next === "works" || next === "all") {
       panel.classList.add("is-open");
       var meltDelay = 0;
+      if (iceState === "frozen" && prev === "" && next === "works" && !window.Site.isMobile()) {
+        // the frost flowers turn into the works
+        iceState = "melting";
+        show(null);
+        buildPileFromFrost(function () { iceState = "none"; });
+        return;
+      }
       if (iceState === "frozen" && prev === "") {
         iceState = "melting";
         window.Ice.toCornerAndMelt(iceLayer, function () { iceState = "none"; });

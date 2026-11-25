@@ -134,6 +134,99 @@ window.WORKS = [
     publications: []
   },
   {
+    id: "tas-nekas",
+    title: "TAS NEKAS",
+    year: 2026,
+    techniques: ["screenprint", "installation"],
+    materials: { en: "Ice, screen print, oil paint", lv: "Ledus, sietspiede, eļļas krāsa", zh: "" },
+    cutout: "images/works/tasnekas/tasnekasCUTOUT.png",
+    images: [
+      "images/works/tasnekas/tasnekas1.jpg",
+      "images/works/tasnekas/tasnekas2.jpg",
+      "images/works/tasnekas/tasnekas3.png",
+      "images/works/tasnekas/tasnekas4.png",
+      "images/works/tasnekas/tasnekas5.png"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "rokas",
+    title: "ROKAS",
+    year: 2026,
+    techniques: ["installation"],
+    materials: { en: "Materials", lv: "Materiāli", zh: "" },
+    cutout: "images/works/Rokas/RokasCUTOUT.png",
+    images: [
+      "images/works/Rokas/Rokas1.jpg",
+      "images/works/Rokas/Rokas2.png",
+      "images/works/Rokas/Rokas3.png",
+      "images/works/Rokas/Rokas4.png"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "jura",
+    title: "JŪRA",
+    year: 2026,
+    techniques: ["video"],
+    materials: { en: "Video", lv: "Video", zh: "" },
+    cutout: "images/works/Jura/juraCUTOUT.png",
+    images: [],
+    video: { link: "" },   // ← paste the YouTube link here
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "videokompozicija-1",
+    title: "VIDEOKOMPOZĪCIJA I",
+    year: 2026,
+    techniques: ["video"],
+    materials: { en: "Video", lv: "Video", zh: "" },
+    cutout: "images/works/VIDEOCOMP1/videocomp1CUTOUT.png",
+    images: [
+      "images/works/VIDEOCOMP1/videocomp11.png",
+      "images/works/VIDEOCOMP1/videocomp12.png",
+      "images/works/VIDEOCOMP1/videocomp13.png"
+    ],
+    video: { link: "" },   // ← paste the YouTube link here
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "videokompozicija-2",
+    title: "VIDEOKOMPOZĪCIJA II",
+    year: 2026,
+    techniques: ["video"],
+    materials: { en: "Video", lv: "Video", zh: "" },
+    cutout: "images/works/VIDEOCOMP2/videocomp2CUTOUT.png",
+    images: [],
+    video: { link: "" },   // ← paste the YouTube link here
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "videokompozicija-3",
+    title: "VIDEOKOMPOZĪCIJA III",
+    year: 2026,
+    techniques: ["video"],
+    materials: { en: "Video", lv: "Video", zh: "" },
+    cutout: "images/works/VIDEOCOMP3/videocomp3CUTOUT.png",
+    images: [],
+    video: { link: "" },   // ← paste the YouTube link here
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
     id: "gaujiens",
     title: "GAUJIENS",
     year: 2025,
@@ -160,6 +253,22 @@ window.WORKS = [
     images: [
       "images/works/MacibuTraucejums/MacibuTraucejums1.png",
       "images/works/MacibuTraucejums/MacibuTraucejums2.png"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "sapnu-kerajs",
+    title: "SAPŅU ĶĒRĀJS",
+    year: 2025,
+    techniques: ["screenprint"],
+    materials: { en: "Screen print on paper", lv: "Sietspiede uz papīra", zh: "" },
+    cutout: "images/works/sapnukerajs/sapnukerajsCUTOUT.png",
+    images: [
+      "images/works/sapnukerajs/sapnukerajs1.png",
+      "images/works/sapnukerajs/sapnukerajs2.png"
     ],
     video: null,
     credits: { photo: "", video: "" },

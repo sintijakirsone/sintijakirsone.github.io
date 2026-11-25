@@ -516,7 +516,7 @@ var CONTACT = {
 
     function frame() {
       if (!running) return;
-      if (grow < 1) grow = Math.min(1, grow + (reduce ? 1 : 0.018));
+      if (grow < 1) grow = Math.min(1, grow + (reduce ? 1 : 0.012));
       if (mode === "wipe") {
         wordAlpha = Math.min(1, wordAlpha + 0.03);
         if (grow >= 0.6 && writeProgress < 1) writeProgress = Math.min(1, writeProgress + (reduce ? 1 : 0.012));
@@ -533,19 +533,9 @@ var CONTACT = {
         wc.globalCompositeOperation = "source-over";
       }
       ctx.clearRect(0, 0, W, H);
-      ctx.globalAlpha = grow;
-      // frost appears from the edges inward
-      var reach = Math.max(W, H) * (0.15 + grow * 0.9);
-      ctx.save();
-      if (grow < 1) {
-        var m = Math.max(0, Math.min(W, H) / 2 - reach / 2);
-        ctx.beginPath();
-        ctx.rect(0, 0, W, H);
-        ctx.rect(m, m, W - 2 * m, H - 2 * m);
-        ctx.clip("evenodd");
-      }
+      // the frost softly fades in
+      ctx.globalAlpha = grow * grow * (3 - 2 * grow);
       ctx.drawImage(frostC, 0, 0);
-      ctx.restore();
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = "destination-out";
       if (wordAlpha > 0 && writeProgress > 0) {

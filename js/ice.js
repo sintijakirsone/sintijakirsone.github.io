@@ -252,6 +252,8 @@
     var r = rng(4242);
     layer.querySelectorAll(".frost").forEach(function (el) {
       if (el.classList.contains("crust")) return;
+      // hold the flower exactly where it stopped, so nothing jumps
+      el.style.transform = el.style.getPropertyValue("--base") + " scale(1)";
       el.classList.remove("grow", "bloom");
       el.style.setProperty("--sway", between(r, 9, 15).toFixed(1) + "s");
       el.style.setProperty("--dx1", between(r, -8, 8).toFixed(0) + "px");
@@ -260,7 +262,7 @@
       el.style.setProperty("--dy2", between(r, -4, 4).toFixed(0) + "px");
       el.style.setProperty("--r1", between(r, -5, 5).toFixed(1) + "deg");
       el.style.setProperty("--r2", between(r, -5, 5).toFixed(1) + "deg");
-      el.style.animationDelay = (-between(r, 0, 6)).toFixed(1) + "s";
+      el.style.animationDelay = between(r, 0, 2.5).toFixed(2) + "s";   // start gently, one after another
       el.classList.add("drift");
     });
   }
@@ -300,6 +302,45 @@
       });
     }, 1150);
     setTimeout(function () { clear(layer); if (done) done(); }, 1150 + moving.length * 40 + 1900);
+  }
+
+  /* ---------- clicking Works: each frost flower flies to a work and turns into it ----------
+     targets: [{ x, y, size }] centres of the works' cutouts on screen
+     reveal(i): shows cutout i when its flower arrives                                  */
+  function morphInto(layer, targets, reveal, done) {
+    var r = rng(77);
+    var flowers = Array.prototype.slice.call(layer.querySelectorAll(".frost.flower"));
+    // the biggest flowers become works, the rest melt where they are
+    flowers.sort(function (a, b) { return b.offsetWidth - a.offsetWidth; });
+    layer.querySelectorAll(".frost.crust").forEach(function (el) { freezeTransform(el); el.classList.add("melt"); });
+    var used = Math.min(flowers.length, targets.length);
+    // pair flowers and works so the paths cross as little as possible: sort both left to right
+    var fl = flowers.slice(0, used).sort(function (a, b) { return parseFloat(a.style.left) - parseFloat(b.style.left); });
+    var order = targets.map(function (t, i) { return i; }).sort(function (a, b) { return targets[a].x - targets[b].x; }).slice(0, used);
+    var pickIdx = order.slice().sort(function () { return 0; });
+    fl.forEach(function (el, j) {
+      var ti = pickIdx[j], t = targets[ti];
+      var base = el.style.getPropertyValue("--base");
+      freezeTransform(el);
+      var delay = j * 70;
+      setTimeout(function () {
+        el.style.transition = "left 1.1s cubic-bezier(.5,0,.25,1), top 1.1s cubic-bezier(.5,0,.25,1), transform 1.1s cubic-bezier(.5,0,.25,1), opacity 0.5s ease 0.75s";
+        el.style.left = t.x + "px";
+        el.style.top = t.y + "px";
+        el.style.transform = base + " rotate(" + between(r, 90, 200).toFixed(0) + "deg) scale(" + Math.max(0.15, t.size / el.offsetWidth).toFixed(3) + ")";
+        el.style.opacity = "0";
+      }, delay);
+      setTimeout(function () { reveal(ti); }, delay + 820);
+    });
+    // flowers without a work melt away; works without a flower simply appear
+    flowers.slice(used).forEach(function (el) {
+      freezeTransform(el); el.classList.add("melt");
+      el.style.transform = el.style.getPropertyValue("--base") + " translateY(30px) scale(0.5)";
+    });
+    targets.forEach(function (t, i) {
+      if (order.indexOf(i) === -1) setTimeout(function () { reveal(i); }, 700 + used * 70 + (i % 5) * 90);
+    });
+    setTimeout(function () { clear(layer); if (done) done(); }, used * 70 + 1700);
   }
 
   function clear(layer) { while (layer.firstChild) layer.removeChild(layer.firstChild); }
@@ -357,6 +398,8 @@
     freezeBottom: freezeBottom,
     drift: drift,
     toCornerAndMelt: toCornerAndMelt,
+    morphInto: morphInto,
+    drawFlower: function (R, bg, seed) { return drawFlower(R, pal(bg || currentBg()), seed || 7, 1); },
     freezeFull: freezeFull,
     meltFull: meltFull,
     clear: clear,

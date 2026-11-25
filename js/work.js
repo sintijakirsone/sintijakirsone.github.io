@@ -13,6 +13,11 @@
     var t = window.TECHNIQUES.filter(function (x) { return x.id === id; })[0];
     return t ? window.Site.t(t) : id;
   }
+  function nextWork(w) {
+    var idx = window.WORKS.indexOf(w);
+    return window.WORKS[(idx + 1) % window.WORKS.length];
+  }
+
   function currentWork() {
     var id = (location.hash || "").replace("#", "");
     return window.WORKS.filter(function (w) { return w.id === id; })[0];
@@ -25,7 +30,9 @@
     video: { en: "Video", lv: "Video", zh: "" },
     prev:  { en: "Previous photo", lv: "Iepriekšējā bilde", zh: "" },
     next:  { en: "Next photo", lv: "Nākamā bilde", zh: "" },
-    close: { en: "Close", lv: "Aizvērt", zh: "" }
+    close: { en: "Close", lv: "Aizvērt", zh: "" },
+    nextWork: { en: "Next work", lv: "Nākamais darbs", zh: "" },
+    more:  { en: "more photos", lv: "vēl bildes", zh: "" }
   };
 
   /* ---------- styles for credits and the photo viewer ---------- */
@@ -43,6 +50,13 @@
     ".lightbox .lb-next { right: 10px; top: 50%; transform: translateY(-50%); }",
     ".lightbox .lb-close { right: 10px; top: 8px; }",
     ".lightbox .lb-close svg { width: 26px; height: 26px; }",
+    ".lightbox .lb-next .lb-work { display: none; }",
+    ".lightbox .lb-next.to-work { display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; text-align: right; }",
+    ".lightbox .lb-next.to-work .lb-work { display: block; max-width: 12em; line-height: 1.4; }",
+    ".lightbox .lb-next.to-work .lb-work small { display: block; opacity: 0.6; font-size: 10px; }",
+    ".shot { position: relative; display: block; }",
+    ".shot .more { position: absolute; right: 12px; bottom: 12px; padding: 4px 9px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: #fff; background: rgba(0,0,0,0.55); pointer-events: none; }",
+    "@media (max-width: 760px) { .lightbox .lb-next.to-work .lb-work { max-width: 8em; } }",
     ".lightbox .lb-bar { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; padding: 0 16px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: #d8d8d2; }",
     "@media (max-width: 760px) { .lightbox .lb-stage { inset: 52px 8px 60px; } .lightbox .lb-stage img { max-width: calc(100vw - 16px); max-height: calc(100vh - 120px); } .lightbox .lb-prev, .lightbox .lb-next { top: auto; bottom: 6px; transform: none; } }"
   ].join("\n");
@@ -97,7 +111,7 @@
   function videoHtml(w) {
     var v = w.video;
     if (!v) return "";
-    var poster = w.images[1] || w.images[0] || "";
+    var poster = w.images[1] || w.images[0] || w.cutout || "";
     if (v.src) {
       return '<video controls preload="metadata" playsinline poster="' + esc(poster) + '" src="' + esc(v.src) + '"></video>';
     }
@@ -133,8 +147,14 @@
             (p.source ? ' <span class="src">— ' + esc(p.source) + '</span>' : "") + '</li>';
         }).join("") + '</ul></div>';
     }
-    var imgs = w.images.map(function (src, i) {
-      return '<img src="' + esc(src) + '" data-i="' + i + '" alt="' + esc(w.title) + ' — ' + (i + 1) + '" loading="' + (i < 2 ? "eager" : "lazy") + '">';
+    // the page shows the first 3 photos; the viewer shows them all
+    var shown = w.images.slice(0, 3), extra = w.images.length - shown.length;
+    var imgs = shown.map(function (src, i) {
+      var tag = '<img src="' + esc(src) + '" data-i="' + i + '" alt="' + esc(w.title) + ' — ' + (i + 1) + '">';
+      if (i === shown.length - 1 && extra > 0) {
+        tag = '<span class="shot">' + tag + '<span class="more">+' + extra + ' ' + esc(t(LABELS.more)) + '</span></span>';
+      }
+      return tag;
     });
 
     // neighbours for "next work"
@@ -183,14 +203,25 @@
     var many = list.length > 1;
     box.innerHTML =
       '<div class="lb-stage"><img alt=""></div>' +
-      (many ? '<button type="button" class="lb-prev" aria-label="' + esc(t(LABELS.prev)) + '">' + ARROW_L + '</button>' +
-              '<button type="button" class="lb-next" aria-label="' + esc(t(LABELS.next)) + '">' + ARROW_R + '</button>' : '') +
+      (many ? '<button type="button" class="lb-prev" aria-label="' + esc(t(LABELS.prev)) + '">' + ARROW_L + '</button>' : '') +
+      '<button type="button" class="lb-next" aria-label="' + esc(t(LABELS.next)) + '">' + ARROW_R +
+        '<span class="lb-work"><small>' + esc(t(LABELS.nextWork)) + '</small>' + esc(nextWork(w).title) + '</span></button>' +
       '<button type="button" class="lb-close" aria-label="' + esc(t(LABELS.close)) + '">' + CROSS + '</button>' +
       '<div class="lb-bar"><span class="lb-count"></span><span class="lb-credit"></span></div>';
     var img = box.querySelector(".lb-stage img");
     var c = w.credits || {};
+    var nb = null;
+    function atEnd() { return i === list.length - 1; }
+    function goNextWork() {
+      close();
+      location.hash = nextWork(w).id;
+    }
+    function forward() { if (atEnd()) goNextWork(); else show(i + 1); }
     function show(n) {
-      i = (n + list.length) % list.length;
+      i = Math.max(0, Math.min(list.length - 1, n));
+      nb = box.querySelector(".lb-next");
+      nb.classList.toggle("to-work", atEnd());
+      nb.setAttribute("aria-label", atEnd() ? t(LABELS.nextWork) + ": " + nextWork(w).title : t(LABELS.next));
       img.src = list[i];
       img.alt = w.title + " — " + (i + 1);
       box.querySelector(".lb-count").textContent = many ? (i + 1) + " / " + list.length : "";
@@ -205,13 +236,13 @@
     }
     function onKey(e) {
       if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight" && many) show(i + 1);
-      else if (e.key === "ArrowLeft" && many) show(i - 1);
+      else if (e.key === "ArrowRight") forward();
+      else if (e.key === "ArrowLeft" && many) show(i === 0 ? list.length - 1 : i - 1);
     }
     box.addEventListener("click", function (e) {
       var b = e.target.closest("button");
-      if (b && b.classList.contains("lb-prev")) show(i - 1);
-      else if (b && b.classList.contains("lb-next")) show(i + 1);
+      if (b && b.classList.contains("lb-prev")) show(i === 0 ? list.length - 1 : i - 1);
+      else if (b && b.classList.contains("lb-next")) forward();
       else if (b && b.classList.contains("lb-close")) close();
       else if (!e.target.closest(".lb-stage img")) close();   // click beside the photo closes
     });
@@ -219,15 +250,15 @@
     var x0 = null;
     box.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
     box.addEventListener("touchend", function (e) {
-      if (x0 === null || !many) return;
+      if (x0 === null) return;
       var dx = e.changedTouches[0].clientX - x0; x0 = null;
-      if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+      if (Math.abs(dx) > 40) { if (dx < 0) forward(); else show(i === 0 ? list.length - 1 : i - 1); }
     });
     document.addEventListener("keydown", onKey);
     document.documentElement.style.overflow = "hidden";
     document.body.appendChild(box);
     show(i);
-    var nb = box.querySelector(".lb-next") || box.querySelector(".lb-close"); nb.focus();
+    box.querySelector(".lb-next").focus();
   }
 
   document.addEventListener("DOMContentLoaded", function () {

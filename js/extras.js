@@ -116,9 +116,106 @@ var SHOW_TOP_BUTTON_AFTER = 400; // px scrolled down before "back to top" appear
     update();
   }
 
+  /* =========================================================
+     PAGE TRANSITIONS — a frost screen covers the page while a
+     work page and its photos load, and when moving between pages.
+     ========================================================= */
+  var COVER_MIN = 450;      // ms the cover stays at least, so it never just flickers
+  var COVER_MAX = 6000;     // ms at most, even if a photo is very slow
+  var cover = null, shownAt = 0;
+
+  css = [
+    ".page-cover { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center;",
+    "  background-color: var(--bg); background-image: var(--texture); background-attachment: fixed;",
+    "  opacity: 1; transition: opacity 0.45s ease; }",
+    ".page-cover.is-hidden { opacity: 0; pointer-events: none; }",
+    ".page-cover canvas { width: 120px; height: 120px; animation: cover-spin 9s linear infinite, cover-breathe 2.4s ease-in-out infinite alternate; }",
+    "@keyframes cover-spin { to { rotate: 360deg; } }",
+    "@keyframes cover-breathe { from { scale: 0.82; opacity: 0.55; } to { scale: 1; opacity: 1; } }",
+    "@media (prefers-reduced-motion: reduce) { .page-cover canvas { animation: none; } .page-cover { transition-duration: 0.01s; } }"
+  ].join("\n");
+  var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+
+  function makeCover(visible) {
+    cover = document.createElement("div");
+    cover.className = "page-cover" + (visible ? "" : " is-hidden");
+    cover.setAttribute("aria-hidden", "true");
+    try {
+      var bg = document.documentElement.getAttribute("data-bg") || "grey";
+      var fl = window.Ice && window.Ice.drawFlower ? window.Ice.drawFlower(100, bg, 11) : null;
+      if (fl) cover.appendChild(fl);
+    } catch (e) {}
+    document.body.appendChild(cover);
+    shownAt = Date.now();
+  }
+  function showCover(instant) {
+    if (!cover) makeCover(false);
+    if (instant) cover.style.transition = "none";
+    void cover.offsetWidth;
+    cover.classList.remove("is-hidden");
+    void cover.offsetWidth;
+    cover.style.transition = "";
+    shownAt = Date.now();
+  }
+  function hideCover() {
+    if (!cover) return;
+    var wait = Math.max(0, COVER_MIN - (Date.now() - shownAt));
+    setTimeout(function () { cover.classList.add("is-hidden"); }, wait);
+  }
+
+  // wait until the visible photos on a work page have loaded
+  function whenPhotosReady(done) {
+    var page = document.getElementById("work-page");
+    var finished = false;
+    function finish() { if (!finished) { finished = true; done(); } }
+    setTimeout(finish, COVER_MAX);
+    var imgs = page ? Array.prototype.slice.call(page.querySelectorAll("img")) : [];
+    var left = imgs.length;
+    if (!left) { finish(); return; }
+    imgs.forEach(function (im) {
+      if (im.complete) { if (--left === 0) finish(); return; }
+      var one = function () { im.removeEventListener("load", one); im.removeEventListener("error", one); if (--left === 0) finish(); };
+      im.addEventListener("load", one); im.addEventListener("error", one);
+    });
+  }
+
+  var isWorkPage = !!document.getElementById("work-page");
+
+  // arriving on a page
+  makeCover(true);
+  function arrived() {
+    if (isWorkPage) whenPhotosReady(hideCover);
+    else hideCover();
+  }
+
+  // the browser "back" button can show a page from memory, still covered
+  window.addEventListener("pageshow", function (e) { if (e.persisted && cover) cover.classList.add("is-hidden"); });
+
+  // on a work page, switching to another work (next work, or from the photo viewer)
+  if (isWorkPage) {
+    window.addEventListener("hashchange", function () {
+      showCover(true);
+      setTimeout(function () { whenPhotosReady(hideCover); }, 30);
+    });
+  }
+
+  // leaving for another page: fade the cover in first, then go
+  document.addEventListener("click", function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+    var url;
+    try { url = new URL(a.getAttribute("href"), location.href); } catch (err) { return; }
+    if (url.origin !== location.origin) return;
+    if (url.pathname === location.pathname) return;      // same page: its own animations handle it
+    e.preventDefault();
+    showCover();
+    setTimeout(function () { location.href = url.href; }, 380);
+  }, false);
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () { addTopButton(); loadLenis(); });
+    document.addEventListener("DOMContentLoaded", function () { addTopButton(); loadLenis(); arrived(); });
   } else {
-    addTopButton(); loadLenis();
+    addTopButton(); loadLenis(); arrived();
   }
 })();
