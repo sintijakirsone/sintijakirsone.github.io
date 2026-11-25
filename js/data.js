@@ -72,54 +72,98 @@ function placeholderWork(id, title, year, techniques, materialsEn, materialsLv, 
   };
 }
 
-/* Works are shown newest year first. Order inside a year = order here. */
+/* Works are shown newest year first. Order inside a year = order here.
+   Each work's pictures live in its own folder in images/works/.
+   The folder name in the paths must match the folder on GitHub exactly
+   (capital letters too), and so must the file endings (.jpg / .png). */
 window.WORKS = [
-{
-  id: "piepuskot",
-  title: "PIEPUŠĶOT",
-  year: 2026,
-  techniques: ["installation"],
-  materials: { en: "signature technique, crystallization", lv: "autortehnika, kristalizācija", zh: "" },
-  cutout: "images/works/piepuskot/piepuskotCUTOUT.png",
-  images: [
-    "images/works/piepuskot/piepuskot1.jpg",
-    "images/works/piepuskot/piepuskot2.jpg",
-    "images/works/piepuskot/piepuskot3.jpg",
-    "images/works/piepuskot/piepuskot4.jpg",
-    "images/works/piepuskot/piepuskot5.jpg",
-    "images/works/piepuskot/piepuskot6.png",
-    "images/works/piepuskot/piepuskot789.png",
-    "images/works/piepuskot/piepuskot10.jpg"
-  ],
-  video: { link: "https://youtu.be/3LB8MtDiuQA" },
-  credits: { photo: "Vārds Uzvārds", video: "Vārds Uzvārds" },
-  text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
-  publications: []
-},
-  placeholderWork("tas-nekas", "TAS NEKAS", 2026, ["screenprint", "installation"],
-    "Ice, screen print, oil paint", "Ledus, sietspiede, eļļas krāsa",
-    { video: { placeholder: true },
-      publications: [
-        { title: "Placeholder article title", source: "Example magazine", url: "#" },
-        { title: "Placeholder interview", source: "Example radio", url: "#" }
-      ] }),
-  placeholderWork("rokas", "ROKAS", 2026, ["installation"],
-    "Plaster cast, pigment", "Ģipša lējums, pigments"),
-  placeholderWork("es-tur-biju", "ES TUR BIJU", 2026, ["video"],
-    "Single-channel video, 6 min", "Viena kanāla video, 6 min",
-    { video: { placeholder: true } }),
-  placeholderWork("sapnu-kerajs", "SAPŅU ĶĒRĀJS", 2025, ["screenprint"],
-    "Screen print on paper", "Sietspiede uz papīra"),
-  placeholderWork("gaujiens", "GAUJIENS", 2025, ["installation", "video"],
-    "Installation, video, sound", "Instalācija, video, skaņa",
-    { video: { placeholder: true } }),
-  placeholderWork("macibu-traucejums", "MĀCĪBU TRAUCĒJUMS", 2025, ["screenprint"],
-    "Screen print, textile", "Sietspiede, tekstils"),
-  placeholderWork("darbs-8", "DARBS 8", 2024, ["screenprint"],
-    "Placeholder materials", "Vietturis materiāli"),
-  placeholderWork("darbs-9", "DARBS 9", 2024, ["installation"],
-    "Placeholder materials", "Vietturis materiāli"),
-  placeholderWork("darbs-10", "DARBS 10", 2024, ["video"],
-    "Placeholder materials", "Vietturis materiāli",
-    { video: { placeholder: true } })
+  {
+    id: "piepuskot",
+    title: "PIEPUŠĶOT",
+    year: 2026,
+    techniques: ["installation"],
+    materials: { en: "signature technique, crystallization", lv: "autortehnika, kristalizācija", zh: "" },
+    cutout: "images/works/piepuskot/piepuskotCUTOUT.png",
+    images: [
+      "images/works/piepuskot/piepuskot1.jpg",
+      "images/works/piepuskot/piepuskot2.jpg",
+      "images/works/piepuskot/piepuskot3.jpg",
+      "images/works/piepuskot/piepuskot4.jpg",
+      "images/works/piepuskot/piepuskot5.jpg",
+      "images/works/piepuskot/piepuskot6.png",
+      "images/works/piepuskot/piepuskot789.png",
+      "images/works/piepuskot/piepuskot10.jpg"
+    ],
+    video: { link: "https://youtu.be/3LB8MtDiuQA" },
+    credits: { photo: "Vārds Uzvārds", video: "Vārds Uzvārds" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "piepuskot-maboca",
+    title: "PIEPUŠĶOT (MABOCA)",
+    year: 2026,
+    techniques: ["installation"],
+    materials: { en: "signature technique, crystallization", lv: "autortehnika, kristalizācija", zh: "" },
+    cutout: "images/works/piepuskotMABOCA/piepuskotMABOCACUTOUT.png",
+    images: [
+      "images/works/piepuskotMABOCA/piepuskotMABOCA1.png",
+      "images/works/piepuskotMABOCA/piepuskotMABOCA2.jpg",
+      "images/works/piepuskotMABOCA/piepuskotMABOCA3.jpg"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "es-te-biju",
+    title: "ES TE BIJU",
+    year: 2026,
+    techniques: ["installation", "video"],
+    materials: { en: "Glass aquarium, video projection", lv: "Stikla akvārijs, video projekcija", zh: "" },
+    cutout: "images/works/Estebiju/EsTeBijuCUTOUT.png",
+    images: [
+      "images/works/Estebiju/EsTeBiju1.png",
+      "images/works/Estebiju/EsTeBiju2.png",
+      "images/works/Estebiju/EsTeBiju3.png"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "gaujiens",
+    title: "GAUJIENS",
+    year: 2025,
+    techniques: ["video"],
+    materials: { en: "Video", lv: "Video", zh: "" },
+    cutout: "images/works/Gaujiens/gaujiensCUTOUT.png",
+    images: [
+      "images/works/Gaujiens/gaujiens1.png",
+      "images/works/Gaujiens/gaujiens2.png",
+      "images/works/Gaujiens/gaujiens3.png"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  },
+  {
+    id: "macibu-traucejums",
+    title: "MĀCĪBU TRAUCĒJUMS",
+    year: 2025,
+    techniques: ["installation"],
+    materials: { en: "Textile objects", lv: "Tekstila objekti", zh: "" },
+    cutout: "images/works/MacibuTraucejums/MacibuTraucejumsCUTOUT.png",
+    images: [
+      "images/works/MacibuTraucejums/MacibuTraucejums1.png",
+      "images/works/MacibuTraucejums/MacibuTraucejums2.png"
+    ],
+    video: null,
+    credits: { photo: "", video: "" },
+    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    publications: []
+  }
 ];
