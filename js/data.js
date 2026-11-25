@@ -99,7 +99,7 @@ window.WORKS = [
       "images/works/piepuskot/piepuskot10.jpg"
     ],
     video: { link: "https://youtu.be/3LB8MtDiuQA" },
-    credits: { photo: "Vārds Uzvārds", video: "Vārds Uzvārds" },
+    credits: { photo: "Maija Sjomkāne, Sintija Kirsone" },
     text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
     publications: []
   },
