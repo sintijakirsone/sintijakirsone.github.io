@@ -335,7 +335,9 @@
   }
 
   function paintAbout() {
-    viewAbout.querySelector(".about-text p").textContent = window.Site.t(window.ABOUT.text);
+    var p = viewAbout.querySelector(".about-text p");
+    p.style.whiteSpace = "pre-line";   // \n\n in the text starts a new paragraph
+    p.textContent = window.Site.t(window.ABOUT.text);
   }
 
   /* ---------- routing ---------- */

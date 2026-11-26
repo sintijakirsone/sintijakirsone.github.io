@@ -42,12 +42,8 @@ window.UI = {
 window.ABOUT = {
   photo: "images/about/Layer1.png",
   text: {
-    en: "Sintija Kirsone is a multidisciplinary artist based in Riga, whose creative practice focuses primarily on creating installations and spatial art objects. Her works do not impose a single fixed narrative; on the contrary, she invites the viewer to become a co-author and find a meaning within the objects that resonates with them on a personal level.
-
-Kirsone’s visual language is inspired by unconventional materials, the aesthetics of form, and elements of design. Exploring the boundary between the functional and the artistic, she seeks out new visual stories and meaningful collisions between the material and the conceptual.",
-    lv: "Sintija Kirsone ir multidisciplināra māksliniece no Rīgas, kura savā radošajā praksē galvenokārt pievēršas instalāciju un telpisku mākslas objektu izveidei. Viņas darbi neuzspiež vienu konkrētu vēstījumu, bet gluži pretēji, māksliniece aicina skatītāju kļūt par līdzautoru un atrast objektos tādu nozīmi, kas personiski rezonē ar viņu pašu.
-
-Kirsones vizuālo valodu iedvesmo neierasti materiāli, formu estētika un dizaina elementi. Pētot robežu starp funkcionālo un māksliniecisko, viņa meklē jaunus vizuālos stāstus un jēgpilnas sadursmes starp materiālo un konceptuālo.",
+    en: "Sintija Kirsone is a multidisciplinary artist based in Riga, whose creative practice focuses primarily on creating installations and spatial art objects. Her works do not impose a single fixed narrative; on the contrary, she invites the viewer to become a co-author and find a meaning within the objects that resonates with them on a personal level.\n\nKirsone’s visual language is inspired by unconventional materials, the aesthetics of form, and elements of design. Exploring the boundary between the functional and the artistic, she seeks out new visual stories and meaningful collisions between the material and the conceptual.",
+    lv: "Sintija Kirsone ir multidisciplināra māksliniece no Rīgas, kura savā radošajā praksē galvenokārt pievēršas instalāciju un telpisku mākslas objektu izveidei. Viņas darbi neuzspiež vienu konkrētu vēstījumu, bet gluži pretēji, māksliniece aicina skatītāju kļūt par līdzautoru un atrast objektos tādu nozīmi, kas personiski rezonē ar viņu pašu.\n\nKirsones vizuālo valodu iedvesmo neierasti materiāli, formu estētika un dizaina elementi. Pētot robežu starp funkcionālo un māksliniecisko, viņa meklē jaunus vizuālos stāstus un jēgpilnas sadursmes starp materiālo un konceptuālo.",
     zh: ""
   }
 };
