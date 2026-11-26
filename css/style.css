@@ -362,6 +362,14 @@ img { max-width: 100%; display: block; }
   display: grid;
   place-items: center;
 }
+.video-item { margin: 0; min-width: 0; }
+.video-item.tall { max-width: 360px; width: 100%; }
+.video-item.tall .video-box { aspect-ratio: 9 / 16; }
+.video-label {
+  margin-top: 8px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-dim);
+}
 .video-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; cursor: default; }
 .video-box .play {
   position: relative;
