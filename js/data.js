@@ -11,9 +11,11 @@
    • "video": null for no video, or
        { src: "videos/my-video.mp4" }          (your own file)
        { link: "https://vimeo.com/..." }      (link to Vimeo/YouTube)
+       or several: [ { link: "..." }, { link: "...", label: { en: "Sketch", lv: "Skice" } } ]
    • "credits": who made the photos and video, e.g.
        credits: { photo: "Anna Ozola", video: ["Jānis Bērziņš", "Sintija Kirsone"] }
      Leave a name out (or "") and that line is not shown.
+   • New paragraph inside a text: type \n\n (never press Enter inside the quotes).
    • Texts have "en", "lv" and "zh". If one is empty,
      English is shown instead.
    ========================================================= */
@@ -82,7 +84,11 @@ window.WORKS = [
     title: "PIEPUŠĶOT",
     year: 2026,
     techniques: ["installation"],
-    materials: { en: "signature technique, crystallization", lv: "autortehnika, kristalizācija", zh: "" },
+    materials: {
+      en: "Ice flowers, signature technique, crystallization · dimensions variable",
+      lv: "Leduspuķes, autortehnika, kristalizācija · maināms izmērs",
+      zh: ""
+    },
     cutout: "images/works/piepuskot/piepuskotCUTOUT.png",
     images: [
       "images/works/piepuskot/piepuskot1.jpg",
@@ -96,7 +102,11 @@ window.WORKS = [
     ],
     video: { link: "https://youtu.be/3LB8MtDiuQA" },
     credits: { photo: "Maija Sjomkāne, Sintija Kirsone" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "Ice flowers bloom across the windows of the room. The work reflects our habit of “piepušķot” – dressing things up, adding a little decoration on top of what is already there.\n\nCreated for the exhibition “Aizvakardiena”, together with professor and artist Ojārs Pētersons.",
+      lv: "Uz telpas logiem uzplaukst leduspuķes. Darbs atspoguļo mūsu ieradumu lietas “piepušķot” – pievienot tām mazliet rotājuma pāri tam, kas jau ir.\n\nDarbs veidots izstādes “Aizvakardiena” ietvaros, kopā ar profesoru un mākslinieku Ojāru Pētersonu.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -104,7 +114,11 @@ window.WORKS = [
     title: "PIEPUŠĶOT (MABOCA)",
     year: 2026,
     techniques: ["installation"],
-    materials: { en: "signature technique, crystallization", lv: "autortehnika, kristalizācija", zh: "" },
+    materials: {
+      en: "Ice flowers, signature technique, crystallization · 1 × 1 m",
+      lv: "Leduspuķes, autortehnika, kristalizācija · 1 × 1 m",
+      zh: ""
+    },
     cutout: "images/works/piepuskotMABOCA/piepuskotMABOCACUTOUT.png",
     images: [
       "images/works/piepuskotMABOCA/piepuskotMABOCA1.png",
@@ -113,7 +127,11 @@ window.WORKS = [
     ],
     video: null,
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "Ice flowers bloom on restored green windows. The work reflects our habit of “piepušķot” – dressing things up, adding a little decoration on top of what is already there.\n\nCreated for the exhibition “Aizvakardiena”.",
+      lv: "Uz restaurētiem, zaļiem logiem uzplaukst leduspuķes. Darbs atspoguļo mūsu ieradumu lietas “piepušķot” – pievienot tām mazliet rotājuma pāri tam, kas jau ir.\n\nDarbs veidots izstādes “Aizvakardiena” ietvaros.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -121,16 +139,27 @@ window.WORKS = [
     title: "ES TE BIJU",
     year: 2026,
     techniques: ["installation", "video"],
-    materials: { en: "Glass aquarium, video projection", lv: "Stikla akvārijs, video projekcija", zh: "" },
+    materials: {
+      en: "Aquarium, water, projection of a 3D animation (Blender) · 20 × 40 cm",
+      lv: "Akvārijs, ūdens, 3D animācijas (Blender) projekcija · 20 × 40 cm",
+      zh: ""
+    },
     cutout: "images/works/Estebiju/EsTeBijuCUTOUT.png",
     images: [
       "images/works/Estebiju/EsTeBiju1.png",
       "images/works/Estebiju/EsTeBiju2.png",
       "images/works/Estebiju/EsTeBiju3.png"
     ],
-    video: null,
+    video: [
+      { link: "https://youtu.be/DYA8UKQxPaA" },
+      { link: "https://youtube.com/shorts/GV-_eyJjkUs" }
+    ],
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "An empty aquarium filled with water. Projected into it is only the shadow of a goldfish – the trace of someone who was here.",
+      lv: "Tukšs akvārijs, piepildīts ar ūdeni. Tajā projicēta vien zelta zivtiņas ēna – pēdas no kāda, kurš te bija.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -138,7 +167,11 @@ window.WORKS = [
     title: "TAS NEKAS",
     year: 2026,
     techniques: ["screenprint", "installation"],
-    materials: { en: "Ice, screen print, oil paint", lv: "Ledus, sietspiede, eļļas krāsa", zh: "" },
+    materials: {
+      en: "Ice, epoxy, screen print, oil paint",
+      lv: "Ledus, epoksīds, sietspiede, eļļas krāsa",
+      zh: ""
+    },
     cutout: "images/works/tasnekas/tasnekasCUTOUT.png",
     images: [
       "images/works/tasnekas/tasnekas1.jpg",
@@ -147,9 +180,16 @@ window.WORKS = [
       "images/works/tasnekas/tasnekas4.png",
       "images/works/tasnekas/tasnekas5.png"
     ],
-    video: null,
+    video: [
+      { link: "https://youtu.be/20s_fpRfrfo" },
+      { link: "https://youtube.com/shorts/Th9m5e4oi4M" }
+    ],
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "The words “tas nekas” (“it's nothing”) are screen printed onto a block of ice and a block of epoxy. When the ice melts, “tas” (“it”) disappears and only “nekas” (“nothing”) remains – and that is nothing.",
+      lv: "Uz ledus un epoksīda kluča sietspiedes tehnikā uzklāts teksts “tas nekas”. Kad ledus izkusīs, “tas” paliks “nekas” – un tas ir nekas.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -157,7 +197,11 @@ window.WORKS = [
     title: "ROKAS",
     year: 2026,
     techniques: ["installation"],
-    materials: { en: "Materials", lv: "Materiāli", zh: "" },
+    materials: {
+      en: "Plaster bandages · 2 × 1 m",
+      lv: "Ģipša saites · 2 × 1 m",
+      zh: ""
+    },
     cutout: "images/works/Rokas/RokasCUTOUT.png",
     images: [
       "images/works/Rokas/Rokas1.jpg",
@@ -167,7 +211,11 @@ window.WORKS = [
     ],
     video: null,
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "A chain of hands, cast in plaster bandages from the artist's own hands.",
+      lv: "Roku ķēde, veidota no ģipša saitēm, atlejot autores pašas rokas.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -175,12 +223,20 @@ window.WORKS = [
     title: "JŪRA",
     year: 2026,
     techniques: ["video"],
-    materials: { en: "Video", lv: "Video", zh: "" },
+    materials: {
+      en: "VR video game · Meta Quest, Unity 6.3 URP",
+      lv: "VR videospēle · Meta Quest, Unity 6.3 URP",
+      zh: ""
+    },
     cutout: "images/works/Jura/juraCUTOUT.png",
     images: [],
-    video: { link: "" },   // ← paste the YouTube link here
+    video: { link: "https://youtu.be/k5x80t-bNQ8" },
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "The player wakes up on a small island rising from the middle of an endless sea, surrounded by clear turquoise water that grows deeper the further you go from the shore. Under the water swim carp – the most universal fish in the world. They float along minding their own business, but you can catch them! A caught carp tells you what it thinks about this frightening situation. If you don't let it go in time, it dies and floats high up into the sky, accompanied by angelic voices. Along the way you can also meet a rubber duck, a swim ring, rubbish bins, a yellow barrel, a very large treasure chest, a fishing boat and more.\n\nThe mechanics are simple: catch fish with the VR controller. You can dive into the water and reach the island's low peaks. Every catch triggers its own sound, and the audio follows your position – from the windy surface of the island to the silence under water. The game invites you to simply exist in a world that, beneath the waves, feels truly simple.",
+      lv: "Spēlētājs pamostas uz mazas salas, kas paceļas bezgalīgas jūras vidū. To ieskauj dzidrs, tirkīzzils ūdens, kas kļūst arvien dziļāks, jo tālāk no krasta dodies. Zem ūdens mīt karpas – pasaules universālākās zivis. Tās savā nodabā peld, bet tu vari tās noķert! Noķerta karpa izsaka savu viedokli par šo, viņai bailīgo, situāciju. Ja nepaspēsi to laikus atlaist atpakaļ brīvībā, karpa nomirs un uzpeldēs augstu debesīs eņģeļu balsu pavadījumā. Spēlē vari sastapt arī citus varoņus – gumijas pīlīti, peldriņķi, miskastes, dzelteno mucu, ļoti lielu bagātību lādi, zvejnieku laivu un vēl!\n\nSpēles mehānika ir vienkārša: ķer zivis ar VR kontrolieri. Vari ienirt ūdenī un sasniegt salas zemās virsotnes. Katra noķeršana izraisa unikālu skaņas reakciju, un skaņa mainās līdz ar spēlētāja atrašanās vietu – no vējainās salas virsmas līdz zemūdens klusumam. Spēle aicina vienkārši eksistēt pasaulē, kas zem viļņiem šķiet patiesi vienkārša.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -195,9 +251,12 @@ window.WORKS = [
       "images/works/VIDEOCOMP1/videocomp12.png",
       "images/works/VIDEOCOMP1/videocomp13.png"
     ],
-    video: { link: "" },   // ← paste the YouTube link here
+    video: [
+      { link: "https://youtu.be/wyGap4I4rik" },
+      { link: "https://youtu.be/Xxxlj6yHExw" }
+    ],
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: { en: "", lv: "", zh: "" },
     publications: []
   },
   {
@@ -208,9 +267,12 @@ window.WORKS = [
     materials: { en: "Video", lv: "Video", zh: "" },
     cutout: "images/works/VIDEOCOMP2/videocomp2CUTOUT.png",
     images: [],
-    video: { link: "" },   // ← paste the YouTube link here
+    video: [
+      { link: "https://youtu.be/iOWVZ6nE0Yo" },
+      { link: "https://youtu.be/sNxnsBQeBHQ", label: { en: "Sketch", lv: "Skice", zh: "" } }
+    ],
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: { en: "", lv: "", zh: "" },
     publications: []
   },
   {
@@ -221,17 +283,24 @@ window.WORKS = [
     materials: { en: "Video", lv: "Video", zh: "" },
     cutout: "images/works/VIDEOCOMP3/videocomp3CUTOUT.png",
     images: [],
-    video: { link: "" },   // ← paste the YouTube link here
+    video: [
+      { link: "https://youtu.be/kg0cxNU1API" },
+      { link: "https://youtu.be/VRRsv_ObuWE", label: { en: "Sketch", lv: "Skice", zh: "" } }
+    ],
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: { en: "", lv: "", zh: "" },
     publications: []
   },
   {
     id: "gaujiens",
     title: "GAUJIENS",
     year: 2025,
-    techniques: ["video"],
-    materials: { en: "Video", lv: "Video", zh: "" },
+    techniques: ["installation"],
+    materials: {
+      en: "Acrylic glass tube, water from the Gauja river · 2 m × 15 cm",
+      lv: "Organiskā stikla caurule, Gaujas ūdens · 2 m × 15 cm",
+      zh: ""
+    },
     cutout: "images/works/Gaujiens/gaujiensCUTOUT.png",
     images: [
       "images/works/Gaujiens/gaujiens1.png",
@@ -240,7 +309,11 @@ window.WORKS = [
     ],
     video: null,
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "The Gauja out for a walk – an environment taken out of its own environment.",
+      lv: "Gauja pastaigā – vide, izņemta no savas vides.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -248,7 +321,11 @@ window.WORKS = [
     title: "MĀCĪBU TRAUCĒJUMS",
     year: 2025,
     techniques: ["installation"],
-    materials: { en: "Textile objects", lv: "Tekstila objekti", zh: "" },
+    materials: {
+      en: "Fabric, sewn soft toys",
+      lv: "Audums, uzšūtas mīkstās mantiņas",
+      zh: ""
+    },
     cutout: "images/works/MacibuTraucejums/MacibuTraucejumsCUTOUT.png",
     images: [
       "images/works/MacibuTraucejums/MacibuTraucejums1.png",
@@ -256,7 +333,11 @@ window.WORKS = [
     ],
     video: null,
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "Soft toys sewn onto fabric, each one standing for a letter of an invented alphabet. The work is about dyslexia.",
+      lv: "Uz auduma uzšūtas mīkstās mantiņas, un katra no tām simbolizē izgudrota alfabēta burtu. Darbs ir par disleksiju.",
+      zh: ""
+    },
     publications: []
   },
   {
@@ -264,7 +345,11 @@ window.WORKS = [
     title: "SAPŅU ĶĒRĀJS",
     year: 2025,
     techniques: ["screenprint"],
-    materials: { en: "Screen print on paper", lv: "Sietspiede uz papīra", zh: "" },
+    materials: {
+      en: "Screen print on wallpaper, oil paint · 1 × 4 m",
+      lv: "Sietspiede uz tapetes, eļļas krāsa · 1 × 4 m",
+      zh: ""
+    },
     cutout: "images/works/sapnukerajs/sapnukerajsCUTOUT.png",
     images: [
       "images/works/sapnukerajs/sapnukerajs1.png",
@@ -272,7 +357,11 @@ window.WORKS = [
     ],
     video: null,
     credits: { photo: "", video: "" },
-    text: { en: "English text about the work.", lv: "Teksts latviski.", zh: "" },
+    text: {
+      en: "The shape of the artist's body, with a “text” in the background describing a dream. Printed on wallpaper, the work becomes something that soaks up all the dreams of the night.",
+      lv: "Autores ķermeņa forma, kuras fonā rakstītais “teksts” apraksta kādu sapni. Uz tapetes darbs kalpo kā lieta, kas uzsūc visus nakts sapņus.",
+      zh: ""
+    },
     publications: []
   }
 ];

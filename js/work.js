@@ -75,7 +75,7 @@
     var c = w.credits || {};
     var t = window.Site.t, rows = "";
     if (names(c.photo)) rows += '<div>' + esc(t(LABELS.photo)) + ': <span>' + esc(names(c.photo)) + '</span></div>';
-    if (names(c.video) && w.video) rows += '<div>' + esc(t(LABELS.video)) + ': <span>' + esc(names(c.video)) + '</span></div>';
+    if (names(c.video) && videoList(w).length) rows += '<div>' + esc(t(LABELS.video)) + ': <span>' + esc(names(c.video)) + '</span></div>';
     return rows ? '<div class="credits">' + rows + '</div>' : "";
   }
 
@@ -108,9 +108,15 @@
     box.parentNode.replaceChild(wrap, box);
   }
 
-  function videoHtml(w) {
-    var v = w.video;
-    if (!v) return "";
+  // "video" can be one video { link: "..." } or a list of them:
+  //   video: [ { link: "..." }, { link: "...", label: { en: "Sketch", lv: "Skice" } } ]
+  // YouTube Shorts links are shown as tall (vertical) videos.
+  function videoList(w) {
+    if (!w.video) return [];
+    return Array.isArray(w.video) ? w.video.filter(Boolean) : [w.video];
+  }
+
+  function oneVideo(w, v) {
     var poster = w.images[1] || w.images[0] || w.cutout || "";
     if (v.src) {
       return '<video controls preload="metadata" playsinline poster="' + esc(poster) + '" src="' + esc(v.src) + '"></video>';
@@ -129,6 +135,14 @@
     }
     return '<div class="video-box"><img src="' + esc(poster) + '" alt=""><span class="play">' + PLAY + '</span>' +
       '<span class="soon">' + esc(window.Site.t(window.UI.videoSoon)) + '</span></div>';
+  }
+
+  function videoHtml(w) {
+    return videoList(w).map(function (v) {
+      var tall = /youtube\.com\/shorts\//.test(v.link || "") || v.vertical;
+      var label = v.label ? '<figcaption class="video-label">' + esc(window.Site.t(v.label)) + '</figcaption>' : "";
+      return '<figure class="video-item' + (tall ? ' tall' : '') + '">' + oneVideo(w, v) + label + '</figure>';
+    }).join("");
   }
 
   function render() {
