@@ -104,7 +104,7 @@ window.WORKS = [
       "images/works/piepuskot/piepuskot10.jpg"
     ],
     video: { link: "https://youtu.be/3LB8MtDiuQA" },
-    credits: { photo: "Maija Sjomkāne, Sintija Kirsone" },
+    credits: { photo: "Maija Sjomkāne" },
     text: {
       en: "Ice flowers bloom across the windows of the room. The work reflects our habit of “piepušķot” – dressing things up, adding a little decoration on top of what is already there.\n\nCreated for the exhibition “Aizvakardiena”, together with professor and artist Ojārs Pētersons.",
       lv: "Uz telpas logiem uzplaukst leduspuķes. Darbs atspoguļo mūsu ieradumu lietas “piepušķot” – pievienot tām mazliet rotājuma pāri tam, kas jau ir.\n\nDarbs veidots izstādes “Aizvakardiena” ietvaros, kopā ar profesoru un mākslinieku Ojāru Pētersonu.",
@@ -129,7 +129,7 @@ window.WORKS = [
       "images/works/piepuskotMABOCA/piepuskotMABOCA3.jpg"
     ],
     video: null,
-    credits: { photo: "", video: "" },
+    credits: { photo: "Maija Sjomkāne", video: "" },
     text: {
       en: "Ice flowers bloom on restored green windows. The work reflects our habit of “piepušķot” – dressing things up, adding a little decoration on top of what is already there.\n\nCreated for the exhibition “Aizvakardiena”.",
       lv: "Uz restaurētiem, zaļiem logiem uzplaukst leduspuķes. Darbs atspoguļo mūsu ieradumu lietas “piepušķot” – pievienot tām mazliet rotājuma pāri tam, kas jau ir.\n\nDarbs veidots izstādes “Aizvakardiena” ietvaros.",
