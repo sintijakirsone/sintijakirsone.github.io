@@ -15,6 +15,9 @@
    • "credits": who made the photos and video, e.g.
        credits: { photo: "Anna Ozola", video: ["Jānis Bērziņš", "Sintija Kirsone"] }
      Leave a name out (or "") and that line is not shown.
+     The photo name is shown under every photo. If some photos have a
+     different author, write that photo like this inside "images":
+       { src: "images/works/rokas/Rokas2.png", photo: "Jānis Bērziņš" }
    • New paragraph inside a text: type \n\n (never press Enter inside the quotes).
    • Texts have "en", "lv" and "zh". If one is empty,
      English is shown instead.

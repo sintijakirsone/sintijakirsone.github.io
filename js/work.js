@@ -40,6 +40,8 @@
   css.textContent = [
     ".credits { margin-top: 18px; font-size: 13px; line-height: 1.6; color: var(--fg-dim); }",
     ".credits span { color: var(--fg); }",
+    ".media figure.photo { margin: 0; min-width: 0; }",
+    ".photo-credit { margin-top: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--fg-dim); }",
     ".lightbox { display: block; padding: 0; cursor: default; user-select: none; }",
     ".lightbox .lb-stage { position: absolute; inset: 56px 72px 64px; display: grid; place-items: center; }",
     ".lightbox .lb-stage img { max-width: calc(100vw - 150px); max-height: calc(100vh - 128px); width: auto; height: auto; object-fit: contain; cursor: default; }",
@@ -71,10 +73,22 @@
     if (!v) return "";
     return (Array.isArray(v) ? v : [v]).filter(Boolean).join(", ");
   }
+  // each photo can be "path.jpg" or { src: "path.jpg", photo: "Name" }.
+  // A photo without its own name uses credits.photo of the work.
+  function photos(w) {
+    var def = (w.credits || {}).photo;
+    return (w.images || []).map(function (x) {
+      if (typeof x === "string") return { src: x, credit: names(def) };
+      return { src: x.src, credit: names(x.photo !== undefined ? x.photo : def) };
+    });
+  }
+  function photoCredit(p) {
+    return p.credit ? window.Site.t(LABELS.photo) + ": " + p.credit : "";
+  }
+
   function creditsHtml(w) {
     var c = w.credits || {};
     var t = window.Site.t, rows = "";
-    if (names(c.photo)) rows += '<div>' + esc(t(LABELS.photo)) + ': <span>' + esc(names(c.photo)) + '</span></div>';
     if (names(c.video) && videoList(w).length) rows += '<div>' + esc(t(LABELS.video)) + ': <span>' + esc(names(c.video)) + '</span></div>';
     return rows ? '<div class="credits">' + rows + '</div>' : "";
   }
@@ -117,7 +131,8 @@
   }
 
   function oneVideo(w, v) {
-    var poster = w.images[1] || w.images[0] || w.cutout || "";
+    var ph = photos(w);
+    var poster = (ph[1] || ph[0] || {}).src || w.cutout || "";
     if (v.src) {
       return '<video controls preload="metadata" playsinline poster="' + esc(poster) + '" src="' + esc(v.src) + '"></video>';
     }
@@ -162,13 +177,14 @@
         }).join("") + '</ul></div>';
     }
     // the page shows the first 3 photos; the viewer shows them all
-    var shown = w.images.slice(0, 3), extra = w.images.length - shown.length;
-    var imgs = shown.map(function (src, i) {
-      var tag = '<img src="' + esc(src) + '" data-i="' + i + '" alt="' + esc(w.title) + ' — ' + (i + 1) + '">';
+    var all = photos(w), shown = all.slice(0, 3), extra = all.length - shown.length;
+    var imgs = shown.map(function (p, i) {
+      var tag = '<img src="' + esc(p.src) + '" data-i="' + i + '" alt="' + esc(w.title) + ' — ' + (i + 1) + '">';
       if (i === shown.length - 1 && extra > 0) {
         tag = '<span class="shot">' + tag + '<span class="more">+' + extra + ' ' + esc(t(LABELS.more)) + '</span></span>';
       }
-      return tag;
+      var cap = photoCredit(p) ? '<figcaption class="photo-credit">' + esc(photoCredit(p)) + '</figcaption>' : "";
+      return '<figure class="photo">' + tag + cap + '</figure>';
     });
 
     // neighbours for "next work"
@@ -208,7 +224,7 @@
 
   /* ---------- photo viewer: arrows, keyboard and swiping ---------- */
   function openGallery(w, start) {
-    var list = w.images, i = start, t = window.Site.t;
+    var ph = photos(w), list = ph.map(function (p) { return p.src; }), i = start, t = window.Site.t;
     var box = document.createElement("div");
     box.className = "lightbox";
     box.setAttribute("role", "dialog");
@@ -239,7 +255,7 @@
       img.src = list[i];
       img.alt = w.title + " — " + (i + 1);
       box.querySelector(".lb-count").textContent = many ? (i + 1) + " / " + list.length : "";
-      box.querySelector(".lb-credit").textContent = names(c.photo) ? t(LABELS.photo) + ": " + names(c.photo) : "";
+      box.querySelector(".lb-credit").textContent = photoCredit(ph[i]);
       // load the neighbours early so switching is instant
       [i + 1, i - 1].forEach(function (k) { var p = new Image(); p.src = list[(k + list.length) % list.length]; });
     }
